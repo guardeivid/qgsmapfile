@@ -3,10 +3,18 @@
 
 from builtins import zip
 from builtins import object
+
 import os
 from copy import deepcopy
-from qgis.core import (QgsSingleSymbolRenderer, QgsCategorizedSymbolRenderer, QgsNullSymbolRenderer, \
-    QgsGraduatedSymbolRenderer, QgsRuleBasedRenderer, QgsRendererRange, QgsRendererCategory)
+from qgis.core import (
+    QgsSingleSymbolRenderer,
+    QgsCategorizedSymbolRenderer,
+    QgsNullSymbolRenderer,
+    QgsGraduatedSymbolRenderer,
+    QgsRuleBasedRenderer,
+    QgsRendererRange,
+    QgsRendererCategory
+)
 from qgis.utils import Qgis
 from .utils import (_ms, _qgis, Util)
 from .symbol_import import SymbolImport

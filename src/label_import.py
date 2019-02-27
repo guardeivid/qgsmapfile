@@ -4,10 +4,10 @@
 from __future__ import print_function
 from builtins import str
 from builtins import object
+
 from copy import deepcopy
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsPalLayerSettings
-from qgis.utils import Qgis
+from qgis.core import QgsPalLayerSettings, QgsWkbTypes
 from .utils import (_ms, _qgis, Util)
 from .expression_import import Expression
 
@@ -83,13 +83,13 @@ class LabelSettings(object):
 
         #PLACEMENT
         self.angle = self.__getMsAngleLabel()
-        if self.geom_type == Qgis.Line:
+        if self.geom_type == QgsWkbTypes.LineGeometry:
             #paralelo=auto, curvo=follow, horizontal=0
             #si es follow
             if self.angle == 'follow':
                 self.__getMsMaxOverlapAngleLabel()
             self.__getMsRepeatDistanceLabel()
-        if self.geom_type == Qgis.Point or self.geom_type == Qgis.Polygon:
+        if self.geom_type == QgsWkbTypes.PointGeometry or self.geom_type == QgsWkbTypes.PolygonGeometry:
             #desplazamiento desde el punto
             self.__getMsPositionLabel()
         self.__getMsOffsetLabel()
@@ -100,7 +100,7 @@ class LabelSettings(object):
         self.__getMsMaxScaleDenomLabel()
         self.__getMsMinSizeLabel()
         self.__getMsMaxSizeLabel()
-        if self.geom_type == Qgis.Line or self.geom_type == Qgis.Polygon:
+        if self.geom_type == QgsWkbTypes.LineGeometry or self.geom_type == QgsWkbTypes.PolygonGeometry:
             self.__getMsMinFeatureSizeLabel()
         self.__getMsForceLabel()
 
@@ -361,7 +361,7 @@ class LabelSettings(object):
             else:
                 #auto|auto2|follow
                 angle = angle.lower()
-                if self.geom_type == Qgis.Line and angle in _ms.LABEL_ANGLE:
+                if self.geom_type == QgsWkbTypes.LineGeometry and angle in _ms.LABEL_ANGLE:
                     self.position = _ms.LABEL_ANGLE[angle]
                     self.__setSetting("placement", self.position, _qgis.PLACEMENT)
 
@@ -465,7 +465,7 @@ class LabelSettings(object):
             self.__setSetting("minFeatureSize", _ms.getSize(minfeaturesize, _ms.UNIT_PIXEL), _qgis.RENDERING)
         else:
             #auto
-            if self.geom_type == Qgis.Polygon:
+            if self.geom_type == QgsWkbTypes.PolygonGeometry:
                 self.__setSetting("fitInPolygonOnly", self.TRUE, _qgis.PLACEMENT)
 
     def __getMsForceLabel(self):

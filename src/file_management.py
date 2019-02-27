@@ -2,7 +2,9 @@
 """docstring for file_management.py"""
 
 from builtins import object
+
 import os
+
 from xml.dom.minidom import parseString
 from tempfile import gettempdir
 from .utils import (_ms, _qgis, Util)

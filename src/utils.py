@@ -3,11 +3,13 @@
 from builtins import str
 from builtins import range
 from builtins import object
+
 import sys
 import os
 import re
 import math
 import matplotlib.font_manager
+
 from qgis.PyQt.QtGui import QColor
 from qgis.PyQt.QtCore import Qt
 from qgis.core import QgsPalLayerSettings #Qgis

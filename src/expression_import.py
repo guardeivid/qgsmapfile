@@ -2,6 +2,7 @@
 """docstring for import_.py"""
 
 from builtins import object
+
 import re
 
 REGEX_STRING = re.compile(r"^(\w*)$")

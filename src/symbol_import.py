@@ -4,16 +4,31 @@
 from builtins import chr
 from builtins import str
 from builtins import object
+
 import os
 import mappyfile
 import matplotlib.font_manager
-from qgis.core import (QgsSymbol, QgsMarkerSymbol, QgsLineSymbol, QgsFillSymbol, \
-    QgsSimpleMarkerSymbolLayer, QgsMarkerLineSymbolLayer, QgsEllipseSymbolLayer, \
-    QgsFontMarkerSymbolLayer, QgsSimpleLineSymbolLayer, QgsSimpleFillSymbolLayer, \
-    QgsCentroidFillSymbolLayer, QgsSVGFillSymbolLayer, QgsRasterFillSymbolLayer, \
-    QgsLinePatternFillSymbolLayer, QgsPointPatternFillSymbolLayer, QgsSvgMarkerSymbolLayer, \
-    QgsArrowSymbolLayer)
-from qgis.utils import Qgis
+
+from qgis.core import (
+    QgsWkbTypes,
+    QgsSymbol,
+    QgsMarkerSymbol,
+    QgsLineSymbol,
+    QgsFillSymbol,
+    QgsSimpleMarkerSymbolLayer,
+    QgsMarkerLineSymbolLayer,
+    QgsEllipseSymbolLayer,
+    QgsFontMarkerSymbolLayer,
+    QgsSimpleLineSymbolLayer,
+    QgsSimpleFillSymbolLayer,
+    QgsCentroidFillSymbolLayer,
+    QgsSVGFillSymbolLayer,
+    QgsRasterFillSymbolLayer,
+    QgsLinePatternFillSymbolLayer,
+    QgsPointPatternFillSymbolLayer,
+    QgsSvgMarkerSymbolLayer,
+    QgsArrowSymbolLayer
+)
 from .utils import (_ms, _qgis, Util)
 from .file_management import FileManagement
 
@@ -45,11 +60,11 @@ class SymbolImport(object):
         new_symbol_layer = False
         for msstyle in self.msclass["styles"][::-1]:
             symbol_layer = None
-            if self.geom_type == Qgis.Point:
+            if self.geom_type == QgsWkbTypes.PointGeometry:
                 symbol_layer = self.__getQgsMarkerSymbolLayer(msstyle)
-            elif self.geom_type == Qgis.Line:
+            elif self.geom_type == QgsWkbTypes.LineGeometry:
                 symbol_layer = self.__getQgsLineSymbolLayer(msstyle)
-            elif self.geom_type == Qgis.Polygon:
+            elif self.geom_type == QgsWkbTypes.PolygonGeometry:
                 symbol_layer = self.__getQgsPolygonSymbolLayer(msstyle)
             if symbol_layer:
                 new_symbol_layer = True
@@ -117,20 +132,14 @@ class SymbolImport(object):
             if type_marker == _ms.MS_SYMBOL_ARROW:
                 #El estilo de relleno de la flecha, no soportado por mapserver
                 #[solid|horizontal|vertical|cross|b_diagonal|f_diagonal|diagonal_x|dense1|dense2|dense3|dense4|dense5|dense6|dense7|no]
-                if Qgis.QGIS_VERSION_INT >= 21600:
-                    props['style'] = 'solid'
-                    props_parent['head_type'] = _qgis.MARKERS_ARROW[symbolname][0]
-                    props_parent['arrow_type'] = _qgis.MARKERS_ARROW[symbolname][1]
-                    props_parent['is_repeated'] = '1' if gap else '0'
-                    self.deleteProperties(props, _qgis.SIMPLE_FILL_SYMBOL_LAYER)
-                    qgsSubSymbol = self.__getSubSymbol(QgsFillSymbol, QgsSimpleFillSymbolLayer, Qgis.Fill, props)
-                    self.deleteProperties(props_parent, _qgis.ARROW_SYMBOL_LAYER)
-                    qgsSymbol = QgsArrowSymbolLayer.create(props_parent)
-                else:
-                    self.deleteProperties(props, _qgis.SIMPLE_MARKER_SYMBOL_LAYER)
-                    qgsSubSymbol = self.__getSubSymbol(QgsMarkerSymbol, QgsSimpleMarkerSymbolLayer, Qgis.Point, props)
-                    self.deleteProperties(props_parent, _qgis.MARKER_LINE_SYMBOL_LAYER)
-                    qgsSymbol = QgsMarkerLineSymbolLayer.create(props_parent)
+                props['style'] = 'solid'
+                props_parent['head_type'] = _qgis.MARKERS_ARROW[symbolname][0]
+                props_parent['arrow_type'] = _qgis.MARKERS_ARROW[symbolname][1]
+                props_parent['is_repeated'] = '1' if gap else '0'
+                self.deleteProperties(props, _qgis.SIMPLE_FILL_SYMBOL_LAYER)
+                qgsSubSymbol = self.__getSubSymbol(QgsFillSymbol, QgsSimpleFillSymbolLayer, QgsWkbTypes.LineGeometry, props)
+                self.deleteProperties(props_parent, _qgis.ARROW_SYMBOL_LAYER)
+                qgsSymbol = QgsArrowSymbolLayer.create(props_parent)
                 qgsSymbol.setSubSymbol(qgsSubSymbol)
             else:
                 self.__getMarkerDisplacementAndRotate(msstyle, gap, props_parent)
@@ -205,7 +214,7 @@ class SymbolImport(object):
                 else:
                     #-Patron de relleno de linea-#
                     self.deleteProperties(props, _qgis.SIMPLE_LINE_SYMBOL_LAYER)
-                    qgsSubSymbol = self.__getSubSymbol(QgsLineSymbol, QgsSimpleLineSymbolLayer, Qgis.Line, props)
+                    qgsSubSymbol = self.__getSubSymbol(QgsLineSymbol, QgsSimpleLineSymbolLayer, QgsWkbTypes.LineGeometry, props)
                     self.deleteProperties(props_parent, _qgis.LINE_PATTERN_FILL_SYMBOL_LAYER)
                     qgsSymbol = QgsLinePatternFillSymbolLayer.create(props_parent)
                     qgsSymbol.setSubSymbol(qgsSubSymbol)
@@ -216,7 +225,7 @@ class SymbolImport(object):
             elif type_marker == _ms.MS_SYMBOL_SVG:
                 #-relleno SVG-#
                 self.deleteProperties(props, _qgis.SIMPLE_LINE_SYMBOL_LAYER)
-                qgsSubSymbol = self.__getSubSymbol(QgsLineSymbol, QgsSimpleLineSymbolLayer, Qgis.Line, props)
+                qgsSubSymbol = self.__getSubSymbol(QgsLineSymbol, QgsSimpleLineSymbolLayer, QgsWkbTypes.LineGeometry, props)
                 self.deleteProperties(props_parent, _qgis.SVG_FILL_SYMBOL_LAYER)
                 qgsSymbol = QgsSVGFillSymbolLayer.create(props_parent)
                 qgsSymbol.setSubSymbol(qgsSubSymbol)
@@ -585,7 +594,7 @@ class SymbolImport(object):
             SymbolLayer = QgsSvgMarkerSymbolLayer
 
         if subsym:
-            return self.__getSubSymbol(QgsMarkerSymbol, SymbolLayer, Qgis.Point, props)
+            return self.__getSubSymbol(QgsMarkerSymbol, SymbolLayer, QgsWkbTypes.PointGeometry, props)
         else:
             return SymbolLayer.create(props)
 

@@ -3,15 +3,23 @@
 
 from future import standard_library
 standard_library.install_aliases()
+
 from builtins import str
 from builtins import object
+
 import os
 import urllib.request, urllib.parse, urllib.error
 import mappyfile
+
 from qgis.PyQt.QtCore import QSettings
-from qgis.core import (QgsProject, QgsLayerTreeLayer, QgsVectorLayer, \
-    QgsRasterLayer, QgsDataSourceUri)
-from qgis.utils import Qgis
+from qgis.core import (
+    QgsProject,
+    QgsWkbTypes,
+    QgsLayerTreeLayer,
+    QgsVectorLayer,
+    QgsRasterLayer,
+    QgsDataSourceUri
+)
 from .utils import (_ms, _qgis, Util)
 from .symbolset import SymbolSet
 from .fontset import FontSet
@@ -212,7 +220,8 @@ class MapfileImport(object):
                 if layer["config"]["type"] == _qgis.TYPE_RASTER:
                     layer["config"]["icon"] = _qgis.ICON_GRID
             elif connectiontype == _ms.CONNTYPE_POSTGIS:
-                layer["config"] = self.parseDataPostgis(layer.get('data', ''))
+                print(layer)
+                layer["config"] = self.parseDataPostgis(layer.get('data', ['']))
                 fromsource = layer["config"]["fromsource"]
                 if not self.isValidSource(fromsource):
                     self.layers.remove(layer)
@@ -246,6 +255,7 @@ class MapfileImport(object):
         uid, pos_uid, pos_srid, pos_scn, srid = (0, 0, 0, 0, -1)
         geom = ''
 
+        data = data[0]
         match_uid = _ms.REGEX_UID.search(data)
         if match_uid:
             pos_uid = match_uid.start(1) - 14
@@ -436,13 +446,13 @@ class MapfileImport(object):
         _type = layer.get('type', '').lower()
 
         if _type == _ms.TYPE_POINT:
-            return (Qgis.Point, _qgis.TYPE_POINT)
+            return (QgsWkbTypes.PointGeometry, _qgis.TYPE_POINT)
         if _type == _ms.TYPE_LINE:
-            return (Qgis.Line, _qgis.TYPE_LINE)
+            return (QgsWkbTypes.LineGeometry, _qgis.TYPE_LINE)
         if _type == _ms.TYPE_POLYGON:
-            return (Qgis.Polygon, _qgis.TYPE_POLYGON)
+            return (QgsWkbTypes.PolygonGeometry, _qgis.TYPE_POLYGON)
         if _type == _ms.TYPE_RASTER:
-            return (Qgis.NoGeometry, _qgis.TYPE_RASTER)
+            return (QgsWkbTypes.NullGeometry, _qgis.TYPE_RASTER)
 
     #TODO ver como se aplica en otras capas, ademas de POSTGIS
     def getLayerFilter(self, layer):
@@ -555,6 +565,8 @@ class MapfileImport(object):
 
         if not data:
             return None
+
+        data = data[0]
 
         if isshape:
             if not data.endswith('.shp'):

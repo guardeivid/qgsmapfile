@@ -43,6 +43,8 @@ pip install mappyfile
 python3 -m pip install --upgrade mappyfile
 ```
 
+pip install matplotlib
+
 ---
 
 Actualizar qgis 2 a 3
@@ -68,6 +70,8 @@ Si sale el error `No such file or directory: `**`tmp/missing`** crearlo en C:\
 cd C:\Users\da2\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins
 C:\OSGeo4W\apps\Python36\Scripts\pyrcc5.bat -o resources.py resources.qrc
 ```
+
+cd C:\Users\User\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\QgsMapfile
 
 ```batch
 @echo off
