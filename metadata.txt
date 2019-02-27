@@ -2,7 +2,7 @@
 name=Qgs Mapfile
 qgisMinimumVersion=3.0
 description=Importar archivo Mapfile (MapServer) a un proyecto QGIS
-version=1.0.0
+version=0.0.2
 author=David Orellano
 email=guardeivid@yahoo.com.ar
 
@@ -11,8 +11,8 @@ about=Este plugin permite importar archivos Mapfile (.map, .lay) de MapServer a 
     Permite importar archivos con la definición de una única capa (LAYER .. END) o con la definición completa de múltiples capas (MAP ... LAYER ... END ... END).
 
 
-tracker=http://bugs
-repository=http://repo
+tracker=https://github.com/guardeivid/qgsmapfile/issues
+repository=https://github.com/guardeivid/qgsmapfile
 # End of mandatory metadata
 
 # Recommended items:
@@ -23,7 +23,7 @@ repository=http://repo
 # Tags are comma separated with spaces allowed
 tags=mapfile, qgis, mapserver, import
 
-homepage=http://homepage
+homepage=https://github.com/guardeivid/qgsmapfile
 
 category=Web
 icon=icon.png

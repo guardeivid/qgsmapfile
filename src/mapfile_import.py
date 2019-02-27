@@ -220,7 +220,6 @@ class MapfileImport(object):
                 if layer["config"]["type"] == _qgis.TYPE_RASTER:
                     layer["config"]["icon"] = _qgis.ICON_GRID
             elif connectiontype == _ms.CONNTYPE_POSTGIS:
-                print(layer)
                 layer["config"] = self.parseDataPostgis(layer.get('data', ['']))
                 fromsource = layer["config"]["fromsource"]
                 if not self.isValidSource(fromsource):
@@ -545,7 +544,7 @@ class MapfileImport(object):
             srid=mslayer["config"]["srid"]
         )
 
-        uri = QgsDataSourceURI(_uri)
+        uri = QgsDataSourceUri(_uri)
         uri.setDataSource(
             mslayer["config"]["schema"],
             mslayer["config"]["table"],
@@ -648,7 +647,6 @@ class MapfileImport(object):
             StyleImport(mslayer, qgslayer, self.symbols, \
                 self.symbolsetpath, self.fontset)
 
-        #q2 QgsMapLayerRegistry q3 QgsProject
         msgroup = self.__getMsGroup(mslayer)
         if msgroup:
             addedlayer = QgsProject.instance().addMapLayer(qgslayer, addToLegend=False)
@@ -659,6 +657,8 @@ class MapfileImport(object):
         if not addedlayer:
             self.iface.messageBar().pushWarning(u'Error', u"El layer {} no se pudo agregar al mapa".format(name))
             return False
+
+        self.setStatus(qgslayer, mslayer)
 
         self.setCustomProperty(qgslayer, mslayer)
         return qgslayer
@@ -679,14 +679,20 @@ class MapfileImport(object):
 
     def setLayerOpacity(self, mslayer, qgslayer):
         """docstring for __setLayerOpacity"""
-        layerTransparency = 0
+        opacity = 1
         if mslayer.get('opacity', -1) != -1:
-            layerTransparency = (100 - int(mslayer.get('opacity')))
-        elif mslayer.get('composite', '') != '':
-            if mslayer['composite'][0].get('opacity', -1) != -1:
-                layerTransparency = (100 - int(mslayer['composite'].get('opacity')))
+            opacity = (int(mslayer.get('opacity')) / 100)
+        elif mslayer.get('composites', '') != '':
+            if mslayer['composites'][0].get('opacity', -1) != -1:
+                opacity = (int(mslayer['composites'][0].get('opacity')) / 100)
 
-        qgslayer.setLayerTransparency(layerTransparency)
+        qgslayer.setOpacity(opacity)
+
+    def setStatus(self, qgslayer, mslayer):
+        status = (mslayer.get('status', 'on')).lower()
+        if status == 'off':
+            QgsProject.instance().layerTreeRoot().findLayer(qgslayer.id()).setItemVisibilityChecked(False)
+
 
     def setCustomProperty(self, qgslayer, mslayer):
         #TODO Guardar propiedades separadas en la capa, ya que al cargar un proyecto no conserva
