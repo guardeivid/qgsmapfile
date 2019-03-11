@@ -1,0 +1,343 @@
+SYMBOL
+  NAME "circle"
+  TYPE ellipse
+  FILLED true
+  POINTS
+    1 1
+  END # POINTS
+END # SYMBOL
+
+SYMBOL
+  NAME "P"
+  TYPE truetype
+  FONT "arial"
+  CHARACTER "P"
+END # SYMBOL
+
+SYMBOL
+  NAME "vertline"
+  TYPE vector
+  FILLED true
+  POINTS
+    0 0
+    0 10
+    2.8 10
+    2.8 0
+    0 0
+  END # POINTS
+  ANCHORPOINT 0.5 0
+END # SYMBOL
+
+SYMBOL
+  NAME "o-flag-trans"
+  TYPE pixmap
+  IMAGE "o-flag-trans.png"
+END # SYMBOL
+
+######## Left column ###############
+
+LAYER  # Simple line
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      5 5
+      25 10
+      45 10
+      35 5
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 6.5
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+LAYER  # Dashed line with symbol overlay
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      5 15
+      25 20
+      45 20
+      35 15
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 5.0
+      PATTERN 40 10 END
+    END # STYLE
+    STYLE
+      SYMBOL "circlef"
+      COLOR 0 0 0
+      SIZE 8
+      INITIALGAP 20
+      GAP 50
+    END
+  END # CLASS
+END # LAYER
+
+LAYER  # Dashed line, varying
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      5 25
+      25 30
+      45 30
+      35 25
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 5.0
+      LINECAP round #[butt|round|square|triangle]
+      LINEJOIN miter #[round|miter|bevel]
+      LINEJOINMAXSIZE 3
+      PATTERN 40 17 0 17 0 17 0 17 END
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+LAYER  # Line dash overlay
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      5 35
+      25 40
+      45 40
+      35 35
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 102 102 102
+      WIDTH 4.0
+    END # STYLE
+    STYLE
+      COLOR 255 255 255
+      WIDTH 2.0
+      LINECAP BUTT
+      PATTERN 8 12 END
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+LAYER  # Line dashed with dashed overlay
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      5 45
+      25 50
+      45 50
+      35 45
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 16.0
+      PATTERN 40 20 20 20 10 20 END
+    END # STYLE
+    STYLE
+      COLOR 209 66 0
+      WIDTH 12.0
+      INITIALGAP 2
+      PATTERN 36 24 16 24 6 24 END
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+LAYER  # Line overlay - 3
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      5 55
+      25 60
+      45 60
+      35 55
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 17.0
+    END # STYLE
+    STYLE
+      COLOR 209 66 0
+      WIDTH 11.0
+    END # STYLE
+    STYLE
+      COLOR 0 0 0
+      WIDTH 1.0
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+######## right column ############
+
+LAYER  # Line - ellipse overlay
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      50 5
+      70 10
+      90 10
+      80 5
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 3.6
+    END # STYLE
+    STYLE
+      COLOR 0 0 0
+      SYMBOL "circlef"
+      SIZE 10
+      GAP 42
+    END # STYLE
+    STYLE
+      COLOR 255 0 0
+      SYMBOL "circlef"
+      SIZE 3
+      GAP 42
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+LAYER  # Line - symbol overlay
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      50 15
+      70 20
+      90 20
+      80 15
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 2.8
+    END # STYLE
+    STYLE
+      COLOR 0 0 0
+      SYMBOL "vertline"
+      SIZE 10.0
+      ANGLE 30
+      GAP -50
+    END # STYLE
+    STYLE
+      COLOR 255 0 0
+      SYMBOL "circlef"
+      SIZE 3
+      GAP 50
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+LAYER  # Line - font overlay
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      50 25
+      70 30
+      90 30
+      80 25
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 6
+    END # STYLE
+    STYLE
+      COLOR 102 0 0
+      SYMBOL "P"
+      SIZE 20
+      GAP -30
+    END # STYLE
+    STYLE
+      COLOR 255 0 0
+      SYMBOL "circlef"
+      SIZE 3
+      GAP 30
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+LAYER  # Line - pixmap overlay
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      50 35
+      70 40
+      90 40
+      80 35
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 6
+    END # STYLE
+    STYLE
+      COLOR 102 0 0
+      SYMBOL "o-flag-trans"
+      SIZE 20
+      GAP -30
+    END # STYLE
+    STYLE
+      COLOR 255 0 0
+      SYMBOL "circlef"
+      SIZE 3
+      GAP 30
+    END # STYLE
+  END # CLASS
+END # LAYER
+
+LAYER  # Line - pixmap overlay
+  STATUS DEFAULT
+  TYPE LINE
+  FEATURE
+    POINTS
+      50 45
+      70 50
+      90 50
+      80 45
+    END # Points
+  END # Feature
+  CLASS
+    STYLE
+      COLOR 0 0 0
+      WIDTH 6
+    END # STYLE
+    STYLE
+      COLOR 102 0 0
+      SYMBOL "o-flag-trans"
+      SIZE 20
+      GAP -30
+      OFFSET -10 -99
+    END # STYLE
+    STYLE
+      COLOR 255 0 0
+      SYMBOL "circlef"
+      SIZE 3
+      GAP 30
+    END # STYLE
+  END # CLASS
+END # LAYER

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<svg baseProfile="full" height="100%" type="vector" version="1.1" viewBox="0 0 1 1" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<g fill="param(fill) #AAA" fill-opacity="param(fill-opacity)" stroke="param(outline) #000" stroke-opacity="param(outline-opacity)" stroke-width="param(outline-width) 0.0125">
+		<path d="M 0 0.375 L 0.35 0.375 L 0.5 0 L 0.65 0.375 L 1 0.375 L 0.75 0.625 L 0.875 1 L 0.5 0.75 L 0.125 1 L 0.25 0.625 L 0 0.375 Z"/>
+	</g>
+</svg>

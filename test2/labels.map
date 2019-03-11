@@ -1,0 +1,360 @@
+MAP
+  FONTSET "../misc/fonts.lst" #requerido para truetype
+
+  LAYER
+    LABELCACHE ON #[on|off]
+  x  LABELITEM "" #[attribute] columna para etiquetar
+  x  LABELMAXSCALEDENOM #[double] Minimum scale at which this LAYER is labeled
+  x  LABELMINSCALEDENOM #[double] Maximum scale at which this LAYER is labeled
+    LABELREQUIRES "![orthoquads]" #[expression] etiqueta si otra capa no se etiqueta
+    POSTLABELCACHE FALSE #[true|false] renderiza la capa despues de cachear todas las etiquetas
+    PROCESSING "LABEL_NO_CLIP=True" #evita cortar etiquetas, evita cambios en la posicion de etiquetas
+    #evita etiquetas duplicadas en mapas en mosaico
+    CLASS
+      EXPRESSION "follow"
+      NAME "test1"
+    x  TEXT '[FIRSTNAME] [LASTNAME]' #[string|expression]
+      MAXSCALEDENOM  #[double]
+      MINSCALEDENOM  #[double]
+      #sobreescribe LAYER LABELITEM
+      LABEL #estilo de la etiqueta
+      x  ALIGN CENTER #[left|center|right] alignment for multiline labels, con WRAP
+      x  ANGLE 0 #[double|auto|auto2|follow|[attribute]] default=0 en grados
+        #auto|auto2|follow para lineas
+        #follow con MAXOVERLAPANGLE
+        ANTIALIAS FALSE #[true|false]
+      x  BUFFER 0 #[integer] padding in pixels, only for cached labels
+      x  COLOR 0 0 0 #[r] [g] [b] | [hexadecimal string] | [attribute]
+        #ENCODING [string] usa utf-8
+        EXPRESSION ([wspeed] > 20 and [wspeed] <= 30) #[string] expresion para decidir cuando se aplica la etiqueta
+      x  FONT "default" #[name|[attribute]] para truetype, alias de la fuente en FONTSET
+      x  FORCE FALSE #[true|false] forzar a dibujar aunque colisione,
+        #si FORCE true y PARTIALS false, se dibujan parciales con colisiones
+        #only for cached labels
+        MAXLENGTH 0 #[integer] se usa con WRAP, valores negativos desde v7 no se soportan
+        #si MAXLENGTH 0 y WRAP ->salto de linea en caracter de wrap
+        #si MAXLENGTH 0 y NO WRAP ->no hace nada
+        #si MAXLENGTH >0 y WRAP ->salto de linea del wrap cuando texto sea > MAXLENGTH
+        #si MAXLENGTH >0 y NO WRAP ->no etiquetar cuando texto sea > MAXLENGTH
+      x  MAXOVERLAPANGLE 22.5 #[double] maximo rango de angulo cuando ANGLE FOLLOW
+      x  MAXSCALEDENOM 0 #[double] Minimum scale a etiquetar
+      x  MAXSIZE 256 #[double] en pixels
+        MINDISTANCE 25 #[integer] en pixeles, distancia entre duplicadas etiquetas
+        #desde 7.2 es calculado el borde de la etiqueta, antes desde el centro
+      x  MINFEATURESIZE AUTO #[integer|auto] minimo tamaño de feature para que se etiquete,
+        #auto es el tamaño de la etiqueta si es menor a la longitud o extension de la feature para lineas y poligonos
+        #en pixeles, for cached labels only
+      x  MINSCALEDENOM 100000000 #[double] Maximum scale a etiquetar
+      x  MINSIZE 4 #[double] en pixeles, minimo tamaño cuando escala
+      x  OFFSET 0 0 #[x][y] en pixeles, relativo a la esquina inferior izquierda de la etiqueta
+        #Si se usa ANGLE FOLLOW, se puede etiquetar paralelamente de dos maneras mas:
+        #OFFSET x -99, etiqueta a la izquierda (-x) o derecha (x) de la feature
+        #OFFSET x 99, etiqueta arriba (x) o abajo (-x) de la feature
+      x  OUTLINECOLOR 255 255 255 #[r] [g] [b] | [hexadecimal string] | [attribute]
+      x  OUTLINEWIDTH 1 #[integer], genera un halo si se seteo OUTLINECOLOR
+        #en la escal especificada en SIZE
+      x  PARTIALS TRUE #[true|false] si se pueden etiquetar en el borde del mapa
+        #si esta FORCE tiene prioridad
+      x  POSITION CC #[ul|uc|ur|cl|cc|cr|ll|lc|lr|auto]
+        #auto es para que no interfiera con otras y mapserver usa segun la geometria:
+        #only available with cached labels
+          #en puntos usa ul|uc|ur|cl|cr|ll|lc|lr
+          #en poligonos usa cc, uc, lc, cl, cr
+          #en lineas usa lc, uc
+        #si hay colisiones no se dibuja a menos que FORCE true
+      x  PRIORITY 1 #[integer]|[item_name]|[attribute] 1-10
+      x  REPEATDISTANCE 10 #[integer] en pixeles, se repetira a una distancia, en lineas
+      x  SHADOWCOLOR #[r] [g] [b] | [hexadecimal string].
+      x  SHADOWSIZE 0 0 #[x][y]|[attribute][attribute]|[x][attribute]|[attribute][y] en pixeles
+      x  SIZE 9 #[integer]|[tiny|small|medium|large|giant]|[attribute]
+        #(tiny,small,medium,large,giant) para bitmap, int en pixeles para truetype
+      x  TEXT "follow (not supported)" #[string|expression] "[NAME_E]"
+        #util cuando hay varios LABEL
+        #sobreescribe LAYER LABELITEM y CLASS TEXT
+      x  TYPE TRUETYPE #[bitmap|truetype]
+      x  WRAP ' ' #[character]
+        STYLE #de un punto o recuadro
+        x  COLOR 0 255 0
+        x  GEOMTRANSFORM labelpoly #[labelpnt|labelpoly]
+          #no aplica a ANGLE FOLLOW
+          #labelpoly genera un rectangulo alrededor de la etiqueta con 1 pixel de padding
+        x  OFFSET -12 0  #[x][y]
+          #POLAROFFSET #[double|attribute] [double|attribute]
+          #The first parameter is a double value in layer SIZEUNITS (or the name of a layer attribute) that specifies the radius/distance.
+          #The second parameter is a double value (or the name of a layer attribute) that specifies the angle (counter clockwise).
+          ANGLE [wangle]      #para labelpnt
+          SYMBOL 'circle'     #para labelpnt
+          SIZE 20             #para labelpnt
+        x  OUTLINECOLOR 0 0 0  #[r] [g] [b] | [hexadecimal string] | [attribute] para labelpnt, posible para borde de recuadro
+          OUTLINEWIDTH 0.0    #[double|attribute] posible para borde de recuadro
+        x  LINEJOIN round #[round|miter|bevel|none] posible para borde de recuadro
+        END
+      END
+    END
+  END
+END
+
+
+#Recorrer LABEL
+Mostrar etiqueta para esta capa (Simple) => 1 solo LABEL y sin EXPRESSION
+o varios CLASS LABEL sin EXPRESSION y con TEXT iguales
+(deberian tener las mismas caracteristicas, excepto el NAME)
+esto solo estaria seteado si es exportado desde qgis,
+sino dificil encontrar varias LABEL en diferentes CLASS con identicas caracteristicas
+
+Si tiene EXPRESSION => Etiqueta basado en reglas
+
+
+Etiquetas en el centroide de un poligono
+LAYER
+POSTLABELCACHE FALSE
+PROCESSING "LABEL_NO_CLIP=ON"
+LABELCACHE ON
+    LABEL
+      PARTIALS TRUE
+      MINDISTANCE 50
+      REPEATDISTANCE 9999
+    END
+END
+
+
+1-Sin Etiquetas
+2-Mostrar etiqueta para esta capa
+3-Etiqueta basado en reglas
+4-Bloqueo
+
+2-
+Texto
+-----
+Etiquetar con: fieldname|expression
+Tipo de letra
+Tamaño
+Unidad de tamaño (puntos, unidad de mapa)
+Estilo (Normal, Negrita, Italica, Negrita e Italica)
+[ ] Texto subrayado
+[ ] Texto tachado
+Color (sin opacidad)
+Transparencia
+Mayusculas/Minusculas (Sin cambios, Todo mayusculas, Todo minusculas, Primera mayuscula)
+Separacion letras
+Separacion palabras
+Modo de mezcla
+Aplicar sustitucion de texto
+  Sustituciones
+
+Formato multilinea
+------------------
+Caracter de division
+Altura de linea (n lineas)
+Alineacion (izquierda, centro, derecha, (POINT) seguir ubicacion de etiquetas)
+
+(LINE)
+[ ] Simbolo de direccion de linea
+  Izquierda
+  Derecha
+Ubicacion:
+  (o) izquierda/derecha, () encima, () debajo
+  [ ] Sentido inverso
+
+[ ] Numero con formato
+  Lugares decimales
+  [ ] Mostrar signo mas
+
+Margen
+------
+[ ] Dibujar buffer de texto
+Tamaño
+Unidad de tamaño (milimetro, unidad de mapa)
+Color (sin opacidad)
+  [ ] Colorear relleno del buffer
+Transparencia
+Estilo de union de plumilla (Bisel, Inglete, Redondo)
+Modo de mezcla
+
+Fondo
+-----
+[ ] Dibujar Fondo
+Forma (Rectangulo, Cuadrado, Circulo, Elipse, SVG)
+Tipo de tamaño (margen, fijo)
+Tamaño X
+Tamaño Y
+Unidad de tamaño (milimetros, unidad de mapa)
+Rotacion (Sincronizar con etiqueta, desplazamiento de etiqueta, fijo)
+Angulo de rotacion si no es sinxronizado
+Desplazamineto X
+Desplazamineto Y
+Unidad de desplazamiento (milimetro, unidad de mapa)
+Radio X
+Radio Y
+Unidad de radio (milimetro, unidad de mapa, % de longitud)
+Transparencia
+Modo de mezcla
+Color de relleno
+Color de borde
+Ancho de borde
+Unidad de ancho de borde (milimetro, unidad de mapa)
+Estilo de union de plumilla (Bisel, Inglete, Redondo)
+
+Sombra
+------
+[ ] Dibujar sombra exterior
+Dibujar bajo (Componente de etiqueta mas bajo, Texto, Margen, Fondo)
+Desplazamiento (grados)
+Desplazamiento (distancia)
+Unidades de desplazamiento (milimetro, unidad de mapa)
+[ ] Usar sombra global
+Radio de enturbamiento
+Unidad de radio de enturbamiento (milimetro, unidad de mapa) alcance de la sombra
+[ ] Enturbiar solo pixeles alfa
+Transparencia
+Escala
+Color
+Modo de mezcla
+
+Ubicacion
+---------
+(POINT)
+Ubicacion:
+(o) Cartografica
+  Distancia
+  Unidad de distancia (milimetro, unidad de mapa)
+  Desplazamiento de distancia (desde punto, desde el contorno de los simbolos)
+  Prioridad de posicion (atributo)
+(o) Alrededor de punto
+  Distancia
+  Unidad de distancia (milimetro, unidad de mapa)
+  Cuadrante (atributo)
+(o) Desplazamiento desde el punto
+  Cuadrante (1,2,3,4,5,6,7,8,9)
+  Desplazamiento X, Y
+  Unidades de desplazamiento (milimetro, unidad de mapa)
+  Rotacion (grados)
+
+(LINE)
+Ubicacion:
+(o) Paralelo
+  Posiciones permitidas:
+  [X] Encima de la linea, [ ] Sobre la linea, [ ] Debajo de la linea
+  [ ] Posicion dependiente de la orientacion de lineas
+  Distancia
+  Unidad de distancia (milimetro, unidad de mapa)
+  Repetir
+  Unidad de repetir (milimetro, unidad de mapa)
+(o) Curvo (igual anterior mas:)
+  Angulo maximo entre caracteres curvados:
+    Dentro
+    Fuera
+(o) Horizontal
+  Repetir
+  Unidad de repetir (milimetro, unidad de mapa)
+
+(POLYGON)
+Ubicacion:
+(o) Desplazamiento dentro del centroide
+  Centroide (o) Poligono visible () El poligono incompleto
+  Forzar puntos dentro del poligono
+  Cuadrante (1,2,3,4,5,6,7,8,9)
+  Desplazamiento X, Y
+  Unidades de desplazamiento (milimetro, unidad de mapa)
+  Rotacion (grados)
+(o) Alrededor del centroide
+  Centroide (o) Poligono visible () El poligono incompleto
+  Forzar puntos dentro del poligono
+  Distancia
+  Unidad de distancia (milimetro, unidad de mapa)
+(o) Usando perimetro
+  Posiciones permitidas:
+  [X] Encima de la linea, [ ] Sobre la linea, [ ] Debajo de la linea
+  [ ] Posicion dependiente de la orientacion de lineas
+  Distancia
+  Unidad de distancia (milimetro, unidad de mapa)
+  Repetir
+  Unidad de repetir (milimetro, unidad de mapa)
+(o) Horizontal (lento)
+(o) Libre (lento)
+(o) Usando perimetro (curvado)
+  Posiciones permitidas:
+  [X] Encima de la linea, [ ] Sobre la linea, [ ] Debajo de la linea
+  [ ] Posicion dependiente de la orientacion de lineas
+  Distancia
+  Unidad de distancia (milimetro, unidad de mapa)
+  Repetir
+  Unidad de repetir (milimetro, unidad de mapa)
+  Angulo maximo entre caracteres curvados:
+    Dentro
+    Fuera
+
+Definido por datos:
+Coordenada X (atributo)
+Coordenada Y (atributo)
+Alineacion (horizontal (atributo), vertical (atributo))
+Rotacion: (atributo) [x] Conservar valores de rotacion de los datos
+Prioridad (rango de bajo a alta)
+
+Representacion
+--------------
+-Opciones de etiquetas:
+  Visibilidad basada en la escala
+    Minimo
+    Maximo
+  Visibilidad basada en el tamaño de pixel (etiquetas en unidad de mapa)
+    Minimo
+    Maximo
+  Indice-Z de etiquetas
+  Mostrar todas las etiquetas para esta (incluidas las que se solapen)
+  Definido por datos:
+    Mostrar etiqueta (atributo), Mostar siempre (atributo)
+    Mostrar etiquetas de arriba abajo
+      (o) Nunca, () cuando esta definida rotacion, () siempre
+-Opciones de objetos espaciales:
+  [ ] Etiquetar cada parte de objeto multiparte
+  (LINE)
+  [ ] Combinar lineas combinadas para evitar etiquetas duplicadas
+
+  [ ] Limitar numero de objetos espaciales a etiquetar
+  Cantidad de objetos
+  (LINE/POLYGON)
+  Suprimir etiquetado de objetos espaciales menores que ... (milimetro)
+  (POLYGON)
+  [ ] Solo dibujar etiquetas que ajusten completamente dentro del poligono
+-Obstaculos:
+  [ ] Desanimar a las etiquetas a que cubran los objetos espaciales
+  Peso (rango de poco a mucho)
+  Minimizar colocacion de etiquetas (sobre el interior del objeto, sobre el contorno del objeto)
+
+
+
+Text = 0
+Family = 1,
+Size = 2, Tamaño
+SizeType = 3, Unidad del tamaño
+Bold = 4, Estilo negrita
+Italic = 5, Estilo cursiva
+Underline = 6, Estilo subrayado
+Color = 7, Color + Transparencia
+XCoordinate = 8, Separacion de letras
+YCoordinate = 9, Separacion de palabras
+XOffset = 10
+YOffset = 11
+Angle = 12
+Alignment = 13
+
+BufferEnabled = 14
+BufferSize = 15
+BufferColor = 16
+BufferBrush = 17
+BorderWidth = 18
+BorderColor = 19
+BorderStyle = 20
+MultilineEnabled = 21
+StrikeOut = 22
+LabelFieldCount = 23
+LabelField = <class 'qgis._core.LabelField'>
+
+l = iface.activeLayer()
+obj = {"nombre": "layername", "fields":["1", "2", "3"], "isactive": True}
+l.setCustomProperty("mslayer", obj)
+
+l = iface.activeLayer()
+mslayer = l.customProperty("mslayer", '')
+print mslayer

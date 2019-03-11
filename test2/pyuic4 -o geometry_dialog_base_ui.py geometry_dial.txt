@@ -1,0 +1,22 @@
+pyuic4 -o geometry_dialog_base_ui.py geometry_dialog_base.ui
+pyuic4 -x calculadora.ui -o calculadora_ui.py
+
+cd C:\Users\da2\.qgis2\python\plugins
+cd catastro
+pyrcc4 -o resources.py resources.qrc
+pyuic4 -x catastro_dialog_base.ui -o catastro_dialog_base_ui.py
+
+cd C:\Users\da2\.qgis2\python\plugins
+cd FilterFeature
+pyrcc4 -o resources.py resources.qrc
+
+
+cd C:\Users\da2\.qgis2\python\plugins\QgsMapfile
+cd C:\Users\User\.qgis2\python\plugins\QgsMapfile
+pyrcc4 -o resources.py resources.qrc
+pyrcc4 -py2 resources.qrc -o resources.py
+pyrcc4 -py2 resources.qrc -o resources_rc.py
+
+cd ui
+pyuic4 -x qgsmapfileimport_dialog_base.ui -o qgsmapfileimport_dialog_base_ui.py
+pyuic4 -x qgsmapfileexport_dialog_base.ui -o qgsmapfileexport_dialog_base_ui.py

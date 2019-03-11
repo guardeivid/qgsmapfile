@@ -1,0 +1,18 @@
+PTS_MM = 0.352778
+MM_PIXEL = 3.77952755933333
+
+size = 10
+PIXEL_MM = 0.26458333331386
+MM_PTS = 2.834643
+size *= PIXEL_MM * MM_PTS
+print(size)
+
+size = 10
+size *= MM_PIXEL * PTS_MM
+print(size)
+
+"""10
+0.264583333314
+2.834643
+1.0
+6.74999364325"""

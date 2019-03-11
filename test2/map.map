@@ -1,0 +1,39 @@
+MAP 
+  NAME "BOILER"  #name to give your map service
+  # default projection of your map EPSG:4326 for Boston
+  EXTENT -71.1914 42.2277 -70.9867 42.3968 
+  # Default size of your map in pixels.  
+  # This can be overriden by passing in parameters via WMS or CGI Template
+  SIZE 500 500
+  # Location of ESRI shape, MapInfo files, tiles etc. 
+  # NOTE: you can explicitly specify full paths in layers DATA element or relative to this path
+  SHAPEPATH "/mapservdata/" 
+  # Path of the file containing the definitions of the graphic symbols
+  # (NOTE! here the path relative is from the mapfile or full) 
+  SYMBOLSET "symbols.sym"
+  # Path of the file containing definitions of TrueType fonts 
+  FONTSET "symbols/fonts/font.lst"
+  # Geographic units 
+  UNITS meters
+  # This is the default output type - can be overridden 
+  # in WMS or Mapserve Request
+  IMAGETYPE "jpeg" 
+  # Default projection of your map - all layers in different 
+  # projection will be reprojected to this
+  PROJECTION 
+   "init=epsg:4326"
+  END
+  
+  WEB
+    # The physical location of where to put temp images
+    # Again this folder needs to be writable by the webserver
+    IMAGEPATH "D:/mapserv/tmp/"    
+    # This is the web virtual path of the physical IMAGEPATH
+    IMAGEURL "/mapserv/tmp/"
+    METADATA
+      #WFS/WMS/OWS meta data goes here
+    END
+  END #End Web
+  
+  # LAYER DEFINITIONS GO HERE
+END # Map File
