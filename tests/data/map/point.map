@@ -1,0 +1,15 @@
+LAYER
+  NAME "poi1"
+  TYPE point
+  DATA "C:\\Users\\da2\\AppData\\Roaming\\QGIS\\QGIS3\\profiles\\default\\python\\plugins\\QgsMapfile\\tests\\data\\shapes\\World_Cities.shp"
+  STATUS on
+  CLASS
+    NAME "test1"
+    STYLE
+        SYMBOL "circle"
+        COLOR 124 145 70
+        OUTLINECOLOR 45 145 145
+        SIZE 12
+    END
+  END
+END

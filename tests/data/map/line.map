@@ -1,0 +1,13 @@
+LAYER
+  NAME "line1"
+  TYPE line
+  DATA "C:\\Users\\da2\\AppData\\Roaming\\QGIS\\QGIS3\\profiles\\default\\python\\plugins\\QgsMapfile\\tests\\data\\shapes\\World_Hydrography.shp"
+  STATUS on
+  CLASS
+    NAME "test1"
+    STYLE
+        COLOR 255 90 40
+        WIDTH 2.5
+    END
+  END
+END

@@ -637,7 +637,7 @@ class MapfileImport(object):
             qgslayer = QgsVectorLayer(path, name, provider)
 
         if not qgslayer.isValid():
-            self.iface.messageBar().pushWarning(u'Error', u"El layer {} no es valido".format(name))
+            self.iface.messageBar().pushWarning(u'Error', u"El layer {} no es valido path {}".format(name, path))
             return False
 
         self.setScaleBasedVisibility(mslayer, qgslayer)

@@ -1,0 +1,28 @@
+MAP
+  SHAPEPATH "C:\\Users\\da2\\AppData\\Roaming\\QGIS\\QGIS3\\profiles\\default\\python\\plugins\\QgsMapfile\\\\tests\\data\\shapes"
+  LAYER
+    #GROUP "group-1"
+    NAME "pol1"
+    TYPE polygon
+    DATA "World_Countries"
+    STATUS on
+    LABELITEM "COUNTRY"
+    CLASS
+      NAME "test1"
+      STYLE
+          COLOR 128 90 255
+          OUTLINECOLOR 25 12 128
+          WIDTH 2
+      END
+      LABEL
+        TYPE TRUETYPE
+        FONT "arial"
+        COLOR 220 20 20
+        SIZE 15
+        POSITION CL
+        PARTIALS FALSE
+        BUFFER 0
+      END
+    END
+  END
+END
