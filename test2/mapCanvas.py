@@ -2,7 +2,7 @@ print(qgis.utils.iface.activeLayer())
 layer = iface.activeLayer()
 #ayer = QgsVectorLayer(path, name, provider)
 if not layer.isValid():
-    raise IOError, "Failed to open the layer"
+    raise(IOError, "Failed to open the layer")
 
 # add layer to the registry
 #QgsMapLayerRegistry.instance().addMapLayer(layer)

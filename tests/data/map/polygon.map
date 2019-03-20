@@ -23,6 +23,15 @@ MAP
         PARTIALS FALSE
         BUFFER 0
       END
+      LABEL
+        TYPE TRUETYPE
+        FONT "arial"
+        COLOR 220 20 20
+        SIZE 15
+        POSITION CL
+        PARTIALS FALSE
+        BUFFER 0
+      END
     END
   END
 END
