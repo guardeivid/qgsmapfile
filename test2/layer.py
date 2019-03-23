@@ -2,37 +2,49 @@ lyr = iface.activeLayer()
 
 if lyr.labeling():
     lbl = lyr.labeling() #qgis._core.QgsVectorLayerSimpleLabeling || QgsRuleBasedLabeling
-    print(lbl)
-    print(lbl.type()) #simple, rule-based
+    #print(lbl)
+    #print(lbl.type()) #simple, rule-based
     
     pal = lbl.settings() #qgis._core.QgsPalLayerSettings
     print(pal) 
     
-    print(pal.propertyDefinitions())
+    '''
+    QgsExpression (const QString &expr)
+    print(pal.getLabelExpression().dump())
+    print(pal.getLabelExpression().expression())
+    print(pal.getLabelExpression().isField())
+    '''
+    pal.wrapChar = 'b'
+    print(pal.wrapChar)
+    
+    
+    print(pal.dataDefinedProperties()) #qgis._core.QgsPropertyCollection
+    print(pal.dataDefinedProperties().count()) #int
+    print(pal.dataDefinedProperties().propertyKeys())
     
     txt = pal.format() #qgis._core.QgsTextFormat
-    print(txt)
+    #print(txt)
     
     buf = txt.buffer() #qgis._core.QgsTextBufferSettings
-    print(buf)
+    #print(buf)
     
     back = txt.background() #qgis._core.QgsTextBackgroundSettings
-    print(back)
+    #print(back)
     
     shw = txt.shadow() #qgis._core.QgsTextShadowSettings
-    print(shw)
+    #print(shw)
     
     props = pal.dataDefinedProperties() #qgis._core.QgsPropertyCollection
-    print(props)
+    #print(props)
     propskeys = props.propertyKeys() #lista
     if propskeys:
-        print(propskeys)
+        #print(propskeys)
         pro = props.property(propskeys[0]) #qgis._core.QgsProperty
-        print(pro.value()) 
+        #print(pro.value()) 
 
 
 lyr.setLabelsEnabled(True)
-print(lyr.labelsEnabled())
+#print(lyr.labelsEnabled())
 
 
 

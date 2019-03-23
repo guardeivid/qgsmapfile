@@ -7,20 +7,25 @@ from builtins import object
 
 from copy import deepcopy
 from qgis.PyQt.QtCore import QVariant
-from qgis.core import QgsPalLayerSettings, QgsWkbTypes
+from qgis.PyQt.QtGui import QFont
+from qgis.core import (
+    QgsPalLayerSettings,
+    QgsPropertyCollection,
+    QgsProperty,
+    QgsTextFormat,
+    QgsTextBufferSettings,
+    QgsTextBackgroundSettings,
+    QgsTextShadowSettings,
+    QgsWkbTypes
+)
 from .utils import (_ms, _qgis, Util)
 from .expression_import import Expression
 
 class LabelSettings(object):
 
-    TRUE = "1" # "true"?
-    TRUE2 = "true"
-    FALSE = "0" # "false"?
-    FALSE2 = "false"
-
     """docstring for LabelSettings"""
-    def __init__(self, qgslayer, geom_type, labelitem, labelminscaledenom, labelmaxscaledenom, \
-        fontset, msclass, mslabel, props, sizeunits, is_rule=False, is_old=False):
+    def __init__(self, qgslayer, geom_type, labelitem, labelminscaledenom, \
+        labelmaxscaledenom, fontset, msclass, mslabel, sizeunits):
         super(LabelSettings, self).__init__()
         self.qgslayer = qgslayer
         self.geom_type = geom_type
@@ -30,20 +35,19 @@ class LabelSettings(object):
         self.fontset = fontset
         self.msclass = msclass
         self.mslabel = mslabel
-        self.props = props
         self.sizeunits = sizeunits
-        self.is_rule = is_rule
-        self.is_old = is_old
 
-        self.background = False
-        self.backshadow = False
+        self.msbackground = False
+        self.msshadow = False
         self.angle = False
         self.position = False
 
-        self.qgLabel = False
-
-        if not is_old:
-            self.qgLabel = QgsPalLayerSettings()
+        self.pal_layer = QgsPalLayerSettings()
+        self.prop_col = QgsPropertyCollection('Collection')
+        self.text_format = QgsTextFormat()
+        self.text_buffer = QgsTextBufferSettings()
+        self.text_background = QgsTextBackgroundSettings()
+        self.text_shadow = QgsTextShadowSettings()
 
     def getLabel(self):
         #TEXT
@@ -61,9 +65,9 @@ class LabelSettings(object):
         if qbuffer:
             self.__getMsOutlinewithLabel()
 
-        (self.background, self.backshadow, backpadding) = self.__getMsGeomTransformLabel()
+        (self.msbackground, self.msshadow, backpadding) = self.__getMsGeomTransformLabel()
         #BACKGROUND o SHAPE
-        if self.background:
+        if self.msbackground:
             #self.__getMsBufferLabel()
             self.__getBufferBackground(backpadding)
             self.__getMsShapeOffsetLabel()
@@ -73,7 +77,7 @@ class LabelSettings(object):
             self.__getMsShapeLinejoinLabel()
 
         #SHADOW
-        if self.backshadow:
+        if self.msshadow:
             self.__getMsBackShadowColorLabel()
             self.__getMsBackShadowOffsetLabel()
         else:
@@ -106,15 +110,12 @@ class LabelSettings(object):
 
         self.__getMsPartialsLabel()
 
-        if not self.is_rule:
-            self.__setCustomsProperties()
-
-        #print(self.props)
-        return self.qgLabel
-
-        #https://qgis.org/api/2.18/qgspallabeling_8h_source.html
-        #https://qgis.org/api/2.2/qgspallabeling_8cpp_source.html
-        #669
+        self.text_format.setBuffer(self.text_buffer)
+        self.text_format.setBackground(self.text_background)
+        self.text_format.setShadow(self.text_shadow)
+        self.pal_layer.setFormat(self.text_format)
+        self.pal_layer.setDataDefinedProperties(self.prop_col)
+        return self.pal_layer
 
     #TEXT
     def __getMsTextLabel(self):
@@ -132,13 +133,7 @@ class LabelSettings(object):
             Expr = Expression(text, self.labelitem, True)
             (exp_type, text) = Expr.type()
 
-        if self.is_rule:
-            isExpression = self.TRUE if isExpression else self.FALSE
-        else:
-            isExpression = self.TRUE2 if isExpression else self.FALSE2
-
-        self.__setSetting("fieldName", text, _qgis.TEXT_STYLE)
-        self.__setSetting("isExpression", isExpression, _qgis.TEXT_STYLE)
+        self.pal_layer.fieldName = text
 
     def __getMsFontLabel(self):
         # "labeling/fontFamily", "labeling/namedStyle"=Normal o "labeling/dataDefined/Family"
@@ -147,14 +142,14 @@ class LabelSettings(object):
         if font:
             match_attr = _qgis.REGEX_ATTR.search(font)
             if match_attr:
-                self.__setdataDefined("Family", field=match_attr.group(1))
+                self.__setdataDefined(QgsPalLayerSettings.Family, match_attr.group(1))
             else:
                 if self.fontset and font:
                     family = Util.getFont(self.fontset.get(font))
                 else:
                     family = Util.getFont(font)
 
-        self.__setSetting("fontFamily", family, _qgis.TEXT_STYLE)
+        self.text_format.setFont(QFont(family, 9))
 
     def __getMsSizeLabel(self):
         # "labeling/fontSize" en pixel, "labeling/fontSizeInMapUnits"=false o "labeling/dataDefined/Size"
@@ -173,46 +168,41 @@ class LabelSettings(object):
         else:
             match_attr = _qgis.REGEX_ATTR.search(size_)
             if match_attr:
-                self.__setdataDefined("Size", field=match_attr.group(1))
+                self.__setdataDefined(QgsPalLayerSettings.Size, match_attr.group(1))
             else:
                 #TODO para Bitmap Fonts
                 #tiny|small|medium|large|giant
                 pass
 
-        self.__setSetting("fontSize", size, _qgis.TEXT_STYLE)
+        self.text_format.setSize(size)
 
     def __getMsColorLabel(self):
-        # "labeling/textColorA", "labeling/textColorB", "labeling/textColorG", "labeling/textColorR", "labeling/textTransp" o "labeling/dataDefined/Color"
-        self.__getColor(self.mslabel, 'color', 'textColor', _qgis.TEXT_STYLE, 'Color', \
-            alpha=False, transp='textTransp')
+        self.__getColor(self.mslabel, 'color', self.text_format, QgsPalLayerSettings.Color)
 
     #FORMAT
     def __getMsWrapLabel(self):
         # "labeling/wrapChar"
         wrap = self.mslabel.get('wrap', '')
-        self.__setSetting("wrapChar", wrap, _qgis.TEXT_FORMAT, escape=True)
+        self.pal_layer.wrapChar = wrap
 
     def __getMsAlignLabel(self):
         # "labeling/multilineAlign" (0,1,2)
         align = self.mslabel.get('align', 'center').lower()
         if align in _ms.ALIGN:
-            self.__setSetting("multilineAlign", _ms.ALIGN[align], _qgis.TEXT_FORMAT)
+            self.pal_layer.multilineAlign = _ms.ALIGN[align]
 
     #BUFFER
     def __getMsOutlinecolorLabel(self):
-        # "labeling/bufferDraw", "labeling/bufferColorA", "labeling/bufferColorB", "labeling/bufferColorG", "labeling/bufferColorR", "labeling/bufferTransp" o "labeling/dataDefined/BufferColor"
-        outlinecolor = self.__getColor(self.mslabel, 'outlinecolor', 'bufferColor', \
-            _qgis.TEXT_BUFFER, 'BufferColor', alpha=False, transp='bufferTransp')
+        outlinecolor = self.__getColor(self.mslabel, 'outlinecolor', self.text_buffer, QgsPalLayerSettings.BufferColor)
         if outlinecolor:
-            #TODO verificar si 1 funciona igual que true para simple label
-            self.__setSetting("bufferDraw", self.TRUE, _qgis.TEXT_BUFFER)
+            self.text_buffer.setEnabled(True)
         return outlinecolor
 
     def __getMsOutlinewithLabel(self):
         # "labeling/bufferSize", "labeling/bufferSizeInMapUnits"=false
         # LABEL OUTLINEWITH no soporta [attribute]
         outlinewidth = int(self.mslabel.get('outlinewidth', 1)) #only int?
-        self.__setSetting("bufferSize", _ms.getSize(outlinewidth, self.sizeunits), _qgis.TEXT_BUFFER)
+        self.text_buffer.setSize(_ms.getSize(outlinewidth, self.sizeunits))
 
     #BACKGROUND
     def __getMsGeomTransformLabel(self):
@@ -229,10 +219,10 @@ class LabelSettings(object):
 
         n = len(back)
         if n == 1:
-            self.__setSetting("shapeDraw", self.TRUE, _qgis.BACKGROUND)
+            self.text_background.setEnabled(True)
             background = back[0]
         elif n > 1:
-            self.__setSetting("shapeDraw", self.TRUE, _qgis.BACKGROUND)
+            self.text_background.setEnabled(True)
 
             #Puede que este 1 para el borde, WIDTH y OUTLINECOLOR (primero)
             #otro para el relleno, COLOR con posibilidad de padding con WIDTH y OUTLINECOLOR del mismo color que COLOR
@@ -258,7 +248,7 @@ class LabelSettings(object):
                 backshadow = background2
 
             if backshadow:
-                self.__setSetting("shadowDraw", self.TRUE, _qgis.SHADOW)
+                self.text_shadow.setEnabled(True)
 
         return (background, backshadow, backpadding)
 
@@ -289,54 +279,48 @@ class LabelSettings(object):
 
     def __getMsShapeOffsetLabel(self):
         # "labeling/shapeOffsetX", "labeling/shapeOffsetY", "labeling/shapeOffsetUnits"=1
-        offset = self.background.get('offset')
+        offset = self.msbackground.get('offset')
         if offset:
             self.__setSetting("shapeOffsetX", _ms.getSize(offset[0], _ms.UNIT_PIXEL), _qgis.BACKGROUND)
             self.__setSetting("shapeOffsetY", _ms.getSize(offset[1], _ms.UNIT_PIXEL), _qgis.BACKGROUND)
 
     def __getMsShapeColorLabel(self):
-        # "labeling/shapeFillColorA", "labeling/shapeFillColorB", "labeling/shapeFillColorG", "labeling/shapeFillColorR" o "labeling/dataDefined/ShapeFillColor"
-        self.__getColor(self.background, 'color', 'shapeFillColor', _qgis.BACKGROUND, 'ShapeFillColor')
+        self.__getColor(self.msbackground, 'color', self.text_background, QgsPalLayerSettings.ShapeFillColor)
 
     def __getMsShapeOutlinecolorLabel(self):
-        # "labeling/shapeBorderColorA", "labeling/shapeBorderColorB", "labeling/shapeBorderColorG", "labeling/shapeBorderColorR" o "labeling/dataDefined/ShapeBorderColor"
-        self.__getColor(self.background, 'outlinecolor', 'shapeBorderColor', _qgis.BACKGROUND, 'ShapeBorderColor')
+        self.__getColor(self.msbackground, 'outlinecolor', self.text_background, QgsPalLayerSettings.ShapeBorderColor)
 
     def __getMsShapeWithLabel(self):
         # "labeling/shapeBorderWidth", "labeling/shapeBorderWidthUnits"=1 o "labeling/dataDefined/ShapeBorderWidth"
-        borderwidth = self.background.get('with', 1)
+        borderwidth = self.msbackground.get('with', 1)
         if isinstance(borderwidth, (int, float)):
             self.__setSetting("shapeBorderWidth", _ms.getSize(borderwidth, _ms.UNIT_PIXEL), _qgis.BACKGROUND)
         else:
             match_attr = _qgis.REGEX_ATTR.search(borderwidth)
             if match_attr:
-                self.__setdataDefined("ShapeBorderWidth", field=match_attr.group(1))
+                self.__setdataDefined(QgsPalLayerSettings.ShapeBorderWidth, match_attr.group(1))
 
     def __getMsShapeLinejoinLabel(self):
         # labeling/shapeJoinStyle"
-        linejoin = self.background.get('linejoin', 'round').lower()
+        linejoin = self.msbackground.get('linejoin', 'round').lower()
         self.__setSetting("shapeJoinStyle", _ms.LINE_JOIN_STYLE[linejoin], _qgis.BACKGROUND)
 
     #SHADOW
     def __getMsBackShadowColorLabel(self):
-        # "labeling/shadowColorB", "labeling/shadowColorG", "labeling/shadowColorR", "labeling/shadowTransparency" o "labeling/dataDefined/ShadowColor"
-        self.__getColor(self.backshadow, 'color', 'shadowColor', _qgis.SHADOW, 'ShadowColor', \
-            alpha=False, transp='shadowTransparency')
+        self.__getColor(self.msshadow, 'color', self.text_shadow, QgsPalLayerSettings.ShadowColor)
 
     def __getMsBackShadowOffsetLabel(self):
         # "labeling/shadowOffsetAngle", "labeling/shadowOffsetDist", "labeling/shadowOffsetUnits"=1
-        offset = self.backshadow.get('offset')
+        offset = self.msshadow.get('offset')
         if offset:
             (dist, angle) = Util.polar(offset[0], offset[1])
             self.__setSetting("shadowOffsetDist", _ms.getSize(dist, _ms.UNIT_PIXEL), _qgis.SHADOW)
             self.__setSetting("shadowOffsetAngle", angle, _qgis.SHADOW)
 
     def __getMsShadowColorLabel(self):
-        # "labeling/shadowDraw", "labeling/shadowColorB", "labeling/shadowColorG", "labeling/shadowColorR", "labeling/shadowTransparency" o "labeling/dataDefined/ShadowColor"
-        color = self.__getColor(self.mslabel, 'shadowcolor', 'shadowColor', _qgis.SHADOW, \
-            'ShadowColor', alpha=False, transp='shadowTransparency')
+        color = self.__getColor(self.mslabel, 'shadowcolor', self.text_shadow, QgsPalLayerSettings.ShadowColor)
         if color:
-            self.__setSetting("shadowDraw", self.TRUE, _qgis.SHADOW)
+            self.text_shadow.setEnabled(True)
         return color
 
     def __getMsShadowSizeLabel(self):
@@ -357,7 +341,7 @@ class LabelSettings(object):
         else:
             match_attr = _qgis.REGEX_ATTR.search(angle)
             if match_attr:
-                self.__setdataDefined("Rotation", field=match_attr.group(1))
+                self.__setdataDefined(QgsPalLayerSettings.Rotation, match_attr.group(1))
             else:
                 #auto|auto2|follow
                 angle = angle.lower()
@@ -420,7 +404,7 @@ class LabelSettings(object):
         else:
             match_attr = _qgis.REGEX_ATTR.search(priority)
             if match_attr:
-                self.__setdataDefined("Priority", field=match_attr.group(1))
+                self.__setdataDefined(QgsPalLayerSettings.Priority, match_attr.group(1))
 
     #RENDERER
     def __getMsMinScaleDenomLabel(self):
@@ -482,58 +466,15 @@ class LabelSettings(object):
         pass
 
     #-----------------------------------------------------------------------------
-    def __getColor(self, msobject, strcolor, prop, group, dataDefined, alpha=True, transp=''):
+    def __getColor(self, msobject, strcolor, qsetting, qproperty):
         color = msobject.get(strcolor)
         if color:
             color_ = _qgis.color(color)
-            if color_[1]:
-                self.__setdataDefined(dataDefined, field=color_[0])
+            if color_[0]:
+                self.__setdataDefined(qproperty, color_[1])
             else:
-                if self.is_rule:
-                    self.__setSetting(prop, color_[0], group)
-                else:
-                    channels = ['R', 'G', 'B']
-                    if alpha:
-                        channels.append('A')
-                    else:
-                        #Convertir alpha a transparency (255=0%)
-                        if transp:
-                            self.__setSetting(transp, _qgis.transp(color_[5]), group)
-
-                    i = 2
-                    for c in channels:
-                        self.__setSetting(prop + c, color_[i], group)
-                        i += 1
+                qsetting.setColor(color_[2])
         return color
 
-    def __setSetting(self, key, value, group=False, escape=False):
-        if escape:
-            value = Util.escape_xml(str(value))
-        if self.is_rule:
-            if group:
-                self.props["rule"]["settings"][group][key] = value
-        else:
-            self.props.append(("labeling/" + key, value))
-
-    def __setdataDefined(self, data, active=True, useExpr=False, expr='', field=''):
-        #valLabel.setDataDefinedProperty(QgsPalLayerSettings.Size,True,True,'%f' %(textSize),'')
-        if not self.is_rule:
-            values = []
-            newPropertyName = "labeling/dataDefined/" + data
-            values.append(self.TRUE if active else self.FALSE)
-            values.append(self.TRUE if useExpr else self.FALSE)
-            values.append(Util.escape_xml(expr))
-            values.append(field)
-            propertyValue = QVariant("~~".join(values))
-            self.props.append((newPropertyName, propertyValue))
-        else:
-            self.props["rule"]["data-defined"][data] = {
-                'expr': Util.escape_xml(expr),
-                'field': field,
-                'active': self.TRUE2 if active else self.FALSE2,
-                'useExpr': self.TRUE2 if useExpr else self.FALSE2
-            }
-
-    def __setCustomsProperties(self):
-        for prop in self.props:
-            self.qgslayer.setCustomProperty(prop[0], str(prop[1]))
+    def __setdataDefined(self, qproperty, field):
+        self.prop_col.setProperty(qproperty, QgsProperty.fromField(field))

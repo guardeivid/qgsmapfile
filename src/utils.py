@@ -515,7 +515,7 @@ class _qgis(object):
                     color_ = QColor(r, g, b, a)
             elif match:
                 #Color es definido por atributo
-                return (match.group(1), True)
+                return (True, match.group(1))
             else:
                 if mscolor in QColor.colorNames():
                     color_ = QColor(mscolor)
@@ -525,7 +525,7 @@ class _qgis(object):
         b = color_.blue()
         a = color_.alpha()
         qcolor_ = "{},{},{},{}".format(r, g, b, a)
-        return (qcolor_, False, r, g, b, a)
+        return (False, qcolor_, color_)
 
     def getSize(self, size, unit):
         pass

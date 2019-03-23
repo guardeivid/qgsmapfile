@@ -384,11 +384,11 @@ class SymbolImport(object):
         color = msstyle.get('color')
         if color:
             color_ = _qgis.color(color, opacity)
-            if color_[1]:
+            if color_[0]:
                 props['color_dd_active'] = props['line_color_dd_active'] = '1'
-                props['color_dd_field'] = props['line_color_dd_field'] = color_[0]
+                props['color_dd_field'] = props['line_color_dd_field'] = color_[1]
             else:
-                props['color'] = props['line_color'] = color_[0]
+                props['color'] = props['line_color'] = color_[1]
             #para flecha y lineas simples
             props['style'] = props['line_style'] = 'solid'
         else:
@@ -404,11 +404,11 @@ class SymbolImport(object):
         outlinecolor = msstyle.get('outlinecolor')
         if outlinecolor:
             outlinecolor_ = _qgis.color(outlinecolor, opacity)
-            if outlinecolor_[1]:
+            if outlinecolor_[0]:
                 props['outline_color_dd_active'] = '1'
-                props['outline_color_dd_field'] = outlinecolor_[0]
+                props['outline_color_dd_field'] = outlinecolor_[1]
             else:
-                props['outline_color'] = props['line_color'] = outlinecolor_[0]
+                props['outline_color'] = props['line_color'] = outlinecolor_[1]
             props['outline_style'] = props['line_style'] = 'solid'
 
         else:
