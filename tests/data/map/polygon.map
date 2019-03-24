@@ -16,18 +16,9 @@ MAP
       END
       LABEL
         TYPE TRUETYPE
-        FONT "arial"
-        COLOR 220 20 20
-        SIZE 15
-        POSITION CL
-        PARTIALS FALSE
-        BUFFER 0
-      END
-      LABEL
-        TYPE TRUETYPE
-        FONT "arial"
-        COLOR 220 20 20
-        SIZE 15
+        FONT "Candara"
+        COLOR '#00000020'
+        SIZE 12
         POSITION CL
         PARTIALS FALSE
         BUFFER 0

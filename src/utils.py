@@ -70,7 +70,11 @@ class _ms(object):
 
     EXTENSIONS = ('.shp', '.gml', '.tif', '.tiff', '.jpeg', '.jpg', '.png')
 
-    ALIGN = {"left": "0", "center": "1", "right": "2"}
+    ALIGN = {
+        "left": QgsPalLayerSettings.MultiLeft,
+        "center": QgsPalLayerSettings.MultiCenter,
+        "right": QgsPalLayerSettings.MultiRight
+    }
 
     LINE_JOIN_STYLE = {
         'miter': Qt.MiterJoin,  #0
@@ -153,8 +157,6 @@ class _qgis(object):
     ICON_WFS = ':/plugins/QgsMapfile/img/mActionAddWfsLayer.svg'
     ICON_GRID = ':/plugins/QgsMapfile/img/mActionAddRasterLayer.svg'
     ICON_WMS = ':/plugins/QgsMapfile/img/mActionAddWmsLayer.svg'
-
-    MARKERS_214 = ["regular_star"] #2.14 = star
 
     MARKERS_WELL_KNOWN = ["square", "rectangle", "diamond", "pentagon", "hexagon", "triangle", \
     "equilateral_triangle", "star", "arrow", "filled_arrowhead", "circle", "cross", "cross_fill", \
@@ -272,176 +274,6 @@ class _qgis(object):
 
     FONT_DEFAULT = 'MS Shell Dlg 2'#'MS Serif'
 
-    LABELING_DEFAULT_OLD = [
-        ("labeling", "pal"),
-        ("labeling/enabled", "true"),
-        ("labeling/drawLabels", "true")
-    ]
-
-    LABELING_RULES = {
-        "version":"",
-        "labeling":{
-            "type":"rule-based",
-            "rules": [
-            ]
-        }
-    }
-
-    LABELING_RULE = {
-        "rule": {
-            "description": "",
-            "scalemaxdenom": None,
-            "filter": "",
-            "scalemindenom":None,
-            "settings": {
-                "text-style": {
-                    'fontItalic': '0',
-                    'fontFamily': 'MS Shell Dlg 2',
-                    'fontLetterSpacing': '0',
-                    'fontUnderline': '0',
-                    'fontWeight': '50',
-                    'fontStrikeout': '0',
-                    'textTransp': '0',
-                    'previewBkgrdColor': '#ffffff',
-                    'fontCapitals': '0',
-                    'textColor': '0,0,0,255',
-                    'fontSizeInMapUnits': '0',
-                    'isExpression': '0',
-                    'blendMode': '0',
-                    'fontSizeMapUnitScale': '0,0,0,0,0,0',
-                    'fontSize': '8.25',
-                    'fieldName': '',
-                    'namedStyle': 'Normal',
-                    'fontWordSpacing': '0',
-                    'useSubstitutions': '0'
-                },
-                "text-format": {
-                    'placeDirectionSymbol': '0',
-                    'multilineAlign': '0',
-                    'rightDirectionSymbol': '&gt;',
-                    'multilineHeight': '1',
-                    'plussign': '0',
-                    'addDirectionSymbol': '0',
-                    'leftDirectionSymbol': '&lt;',
-                    'formatNumbers': '0',
-                    'decimals': '3',
-                    'wrapChar': '',
-                    'reverseDirectionSymbol': '0'
-                },
-                "text-buffer": {
-                    'bufferSize': '1',
-                    'bufferSizeMapUnitScale': '0,0,0,0,0,0',
-                    'bufferColor': '255,255,255,255',
-                    'bufferDraw': '0',
-                    'bufferBlendMode': '0',
-                    'bufferTransp': '0',
-                    'bufferSizeInMapUnits': '0',
-                    'bufferNoFill': '0',
-                    'bufferJoinStyle': '64'
-                },
-                "background": {
-                    'shapeSizeUnits': '1',  #MM
-                    'shapeType': '0',   # rectangulo
-                    'shapeSVGFile': '',
-                    'shapeOffsetX': '0',
-                    'shapeOffsetY': '0',
-                    'shapeBlendMode': '0',
-                    'shapeFillColor': '255,255,255,255',
-                    'shapeTransparency': '0',
-                    'shapeSizeMapUnitScale': '0,0,0,0,0,0',
-                    'shapeSizeType': '0', # margen
-                    'shapeJoinStyle': '64',
-                    'shapeDraw': '0',   # dibujar o no rectangulo
-                    'shapeBorderWidthUnits': '1',
-                    'shapeSizeX': '0',
-                    'shapeSizeY': '0',
-                    'shapeOffsetMapUnitScale': '0,0,0,0,0,0',
-                    'shapeRadiiX': '0',
-                    'shapeRadiiY': '0',
-                    'shapeOffsetUnits': '1',
-                    'shapeRotation': '0',   # angulo de rotacion
-                    'shapeBorderWidth': '0',
-                    'shapeBorderColor': '128,128,128,255',
-                    'shapeRotationType': '0',   # sincronizar con etiqueta
-                    'shapeBorderWidthMapUnitScale': '0,0,0,0,0,0',
-                    'shapeRadiiMapUnitScale': '0,0,0,0,0,0',
-                    'shapeRadiiUnits': '1'
-                },
-                "shadow": {
-                    'shadowOffsetMapUnitScale': '0,0,0,0,0,0',
-                    'shadowOffsetGlobal': '1',
-                    'shadowRadiusUnits': '1',
-                    'shadowTransparency': '30',
-                    'shadowColor': '0,0,0,255',
-                    'shadowUnder': '0',
-                    'shadowScale': '100',
-                    'shadowOffsetDist': '1',
-                    'shadowDraw': '0',
-                    'shadowOffsetAngle': '135',
-                    'shadowRadius': '1.5',
-                    'shadowRadiusMapUnitScale': '0,0,0,0,0,0',
-                    'shadowBlendMode': '6',
-                    'shadowRadiusAlphaOnly': '0',
-                    'shadowOffsetUnits': '1'
-                },
-                "placement": {
-                    'placement': '1',
-                    'angleOffset': '0',
-                    'placementFlags': '10',
-                    'dist': '0',
-                    'distInMapUnits': '0',
-                    'distMapUnitScale': '0,0,0,0,0,0',
-                    'repeatDistance': '0',
-                    'repeatDistanceUnit': '1',
-                    'repeatDistanceMapUnitScale': '0,0,0,0,0,0',
-                    'xOffset': '0',
-                    'yOffset': '0',
-                    'offsetType': '0',
-                    'labelOffsetInMapUnits': 'false',
-                    'labelOffsetMapUnitScale': '0,0,0,0,0,0',
-                    'predefinedPositionOrder': 'TR,TL,BR,BL,R,L,TSR,BSR',
-                    'preserveRotation': '1',
-                    'centroidInside': '0',
-                    'centroidWhole': '0',
-                    'maxCurvedCharAngleIn': '20',
-                    'maxCurvedCharAngleOut': '-20',
-                    'fitInPolygonOnly': '0',
-                    'quadOffset': '5',
-                    'priority': '5'
-                },
-                "rendering": {
-                    'scaleVisibility': "0",
-                    'scaleMin': "1",
-                    'scaleMax': "10000000",
-                    'fontLimitPixelSize': "0",
-                    'fontMinPixelSize': "3",
-                    'fontMaxPixelSize': "10000",
-                    'zIndex': "0",
-                    'displayAll': "0",
-                    'upsidedownLabels': "0",
-                    'labelPerPart': "0",
-                    'mergeLines': "0",  #line
-                    'limitNumLabels': "0",
-                    'maxNumLabels': "2000",
-                    'minFeatureSize': "0",
-                    'obstacle': "1",
-                    'obstacleFactor': "1",
-                    'obstacleType': "0"
-                },
-                "data-defined": {
-                    "Size": {},
-                    "Color": {},
-                    "Family": {},
-                    "BufferColor": {},
-                    "ShapeFillColor": {},
-                    "ShapeBorderColor": {},
-                    "ShapeBorderWidth": {},
-                    "Rotation": {}
-                }
-            }
-        }
-    }
-
     LABEL_POSITION_MAP = {
         QgsPalLayerSettings.QuadrantAboveLeft:  'ul',
         QgsPalLayerSettings.QuadrantAbove:      'uc',
@@ -453,14 +285,6 @@ class _qgis(object):
         QgsPalLayerSettings.QuadrantBelow:      'lc',
         QgsPalLayerSettings.QuadrantBelowRight: 'lr'
     }
-
-    TEXT_STYLE = "text-style"
-    TEXT_FORMAT = "text-format"
-    TEXT_BUFFER = "text-buffer"
-    BACKGROUND = "background"
-    SHADOW = "shadow"
-    PLACEMENT = "placement"
-    RENDERING = "rendering"
 
     #-----------------------------------------
     TEMPLATE_SVG = {
@@ -524,8 +348,9 @@ class _qgis(object):
         g = color_.green()
         b = color_.blue()
         a = color_.alpha()
+        o = a/255
         qcolor_ = "{},{},{},{}".format(r, g, b, a)
-        return (False, qcolor_, color_)
+        return (False, qcolor_, color_, o)
 
     def getSize(self, size, unit):
         pass

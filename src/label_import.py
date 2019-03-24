@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 """docstring for import_.py"""
 
-from __future__ import print_function
 from builtins import str
 from builtins import object
 
-from copy import deepcopy
-from qgis.PyQt.QtCore import QVariant
+from qgis.PyQt.QtCore import QVariant, QPointF, QSizeF
 from qgis.PyQt.QtGui import QFont
 from qgis.core import (
     QgsPalLayerSettings,
@@ -16,7 +14,8 @@ from qgis.core import (
     QgsTextBufferSettings,
     QgsTextBackgroundSettings,
     QgsTextShadowSettings,
-    QgsWkbTypes
+    QgsWkbTypes,
+    QgsUnitTypes
 )
 from .utils import (_ms, _qgis, Util)
 from .expression_import import Expression
@@ -147,37 +146,31 @@ class LabelSettings(object):
                 if self.fontset and font:
                     family = Util.getFont(self.fontset.get(font))
                 else:
-                    family = Util.getFont(font)
+                    family = font #Util.getFont(font)
 
         self.text_format.setFont(QFont(family, 9))
 
     def __getMsSizeLabel(self):
         # "labeling/fontSize" en pixel, "labeling/fontSizeInMapUnits"=false o "labeling/dataDefined/Size"
-        #mapserver solo integer
-        #fontSizeInMapUnits; //true if font size is in map units (otherwise in points)
-        """
-        https://qgis.org/api/2.18/qgspallabeling_8h_source.html#217
-        enum SizeUnit{Points = 0, MM, MapUnits, Percent}
-        """
-        size = 9
-        size_ = self.mslabel.get('size', 9)
-        print(size_)
-        if isinstance(size_, int):
-            #ptsTomm = ( unit == Points ? 0.352778 : 1 )
-            size = size_ * _ms.PIXEL_MM * _ms.MM_PTS
+        # mapserver only integer
+        size = self.mslabel.get('size', 9)
+        if isinstance(size, int):
+            # there is unit pixel now
+            pass
         else:
-            match_attr = _qgis.REGEX_ATTR.search(size_)
+            match_attr = _qgis.REGEX_ATTR.search(size)
             if match_attr:
                 self.__setdataDefined(QgsPalLayerSettings.Size, match_attr.group(1))
             else:
-                #TODO para Bitmap Fonts
+                #TODO for Bitmap Fonts
                 #tiny|small|medium|large|giant
                 pass
 
+        self.text_format.setSizeUnit(QgsUnitTypes.RenderPixels)
         self.text_format.setSize(size)
 
     def __getMsColorLabel(self):
-        self.__getColor(self.mslabel, 'color', self.text_format, QgsPalLayerSettings.Color)
+        self.__getColor(self.mslabel, 'color', self.text_format, QgsPalLayerSettings.Color, True)
 
     #FORMAT
     def __getMsWrapLabel(self):
@@ -193,7 +186,7 @@ class LabelSettings(object):
 
     #BUFFER
     def __getMsOutlinecolorLabel(self):
-        outlinecolor = self.__getColor(self.mslabel, 'outlinecolor', self.text_buffer, QgsPalLayerSettings.BufferColor)
+        outlinecolor = self.__getColor(self.mslabel, 'outlinecolor', self.text_buffer, QgsPalLayerSettings.BufferColor, True)
         if outlinecolor:
             self.text_buffer.setEnabled(True)
         return outlinecolor
@@ -274,15 +267,15 @@ class LabelSettings(object):
     def __getBufferBackground(self, padding):
         # "labeling/shapeSizeX", "labeling/shapeSizeY", "labeling/shapeSizeUnits"=1 MM
         pad_mm = _ms.getSize(padding, _ms.UNIT_PIXEL)
-        self.__setSetting("shapeSizeX", pad_mm, _qgis.BACKGROUND)
-        self.__setSetting("shapeSizeY", pad_mm, _qgis.BACKGROUND)
+        self.text_background.setSize(QSizeF(pad_mm, pad_mm))
 
     def __getMsShapeOffsetLabel(self):
         # "labeling/shapeOffsetX", "labeling/shapeOffsetY", "labeling/shapeOffsetUnits"=1
         offset = self.msbackground.get('offset')
         if offset:
-            self.__setSetting("shapeOffsetX", _ms.getSize(offset[0], _ms.UNIT_PIXEL), _qgis.BACKGROUND)
-            self.__setSetting("shapeOffsetY", _ms.getSize(offset[1], _ms.UNIT_PIXEL), _qgis.BACKGROUND)
+            x = _ms.getSize(offset[0], _ms.UNIT_PIXEL)
+            y = _ms.getSize(offset[1], _ms.UNIT_PIXEL)
+            self.text_background.setOffset(QPointF(x, y))
 
     def __getMsShapeColorLabel(self):
         self.__getColor(self.msbackground, 'color', self.text_background, QgsPalLayerSettings.ShapeFillColor)
@@ -294,7 +287,7 @@ class LabelSettings(object):
         # "labeling/shapeBorderWidth", "labeling/shapeBorderWidthUnits"=1 o "labeling/dataDefined/ShapeBorderWidth"
         borderwidth = self.msbackground.get('with', 1)
         if isinstance(borderwidth, (int, float)):
-            self.__setSetting("shapeBorderWidth", _ms.getSize(borderwidth, _ms.UNIT_PIXEL), _qgis.BACKGROUND)
+            self.text_background.setStrokeWidth(_ms.getSize(borderwidth, _ms.UNIT_PIXEL))
         else:
             match_attr = _qgis.REGEX_ATTR.search(borderwidth)
             if match_attr:
@@ -303,22 +296,22 @@ class LabelSettings(object):
     def __getMsShapeLinejoinLabel(self):
         # labeling/shapeJoinStyle"
         linejoin = self.msbackground.get('linejoin', 'round').lower()
-        self.__setSetting("shapeJoinStyle", _ms.LINE_JOIN_STYLE[linejoin], _qgis.BACKGROUND)
+        self.text_background.setJoinStyle(_ms.LINE_JOIN_STYLE[linejoin])
 
     #SHADOW
     def __getMsBackShadowColorLabel(self):
-        self.__getColor(self.msshadow, 'color', self.text_shadow, QgsPalLayerSettings.ShadowColor)
+        self.__getColor(self.msshadow, 'color', self.text_shadow, QgsPalLayerSettings.ShadowColor, True)
 
     def __getMsBackShadowOffsetLabel(self):
         # "labeling/shadowOffsetAngle", "labeling/shadowOffsetDist", "labeling/shadowOffsetUnits"=1
         offset = self.msshadow.get('offset')
         if offset:
             (dist, angle) = Util.polar(offset[0], offset[1])
-            self.__setSetting("shadowOffsetDist", _ms.getSize(dist, _ms.UNIT_PIXEL), _qgis.SHADOW)
-            self.__setSetting("shadowOffsetAngle", angle, _qgis.SHADOW)
+            self.text_shadow.setOffsetDistance(_ms.getSize(dist, _ms.UNIT_PIXEL))
+            self.text_shadow.setOffsetAngle(angle)
 
     def __getMsShadowColorLabel(self):
-        color = self.__getColor(self.mslabel, 'shadowcolor', self.text_shadow, QgsPalLayerSettings.ShadowColor)
+        color = self.__getColor(self.mslabel, 'shadowcolor', self.text_shadow, QgsPalLayerSettings.ShadowColor, True)
         if color:
             self.text_shadow.setEnabled(True)
         return color
@@ -329,15 +322,15 @@ class LabelSettings(object):
         if shadowsize:
             if isinstance(shadowsize[0], (int, float)) and isinstance(shadowsize[1], (int, float)):
                 (dist, angle) = Util.polar(shadowsize[0], shadowsize[1])
-                self.__setSetting("shadowOffsetDist", _ms.getSize(dist, _ms.UNIT_PIXEL), _qgis.SHADOW)
-                self.__setSetting("shadowOffsetAngle", angle, _qgis.SHADOW)
+                self.text_shadow.setOffsetDistance(_ms.getSize(dist, _ms.UNIT_PIXEL))
+                self.text_shadow.setOffsetAngle(angle)
 
     #PLACEMENT
     def __getMsAngleLabel(self):
         # "labeling/placement", "labeling/angleOffset" o "labeling/dataDefined/Rotation"
         angle = self.mslabel.get('angle', 0)
         if isinstance(angle, (int, float)):
-            self.__setSetting("angleOffset", angle, _qgis.PLACEMENT)
+            self.pal_layer.angleOffset = angle
         else:
             match_attr = _qgis.REGEX_ATTR.search(angle)
             if match_attr:
@@ -347,7 +340,7 @@ class LabelSettings(object):
                 angle = angle.lower()
                 if self.geom_type == QgsWkbTypes.LineGeometry and angle in _ms.LABEL_ANGLE:
                     self.position = _ms.LABEL_ANGLE[angle]
-                    self.__setSetting("placement", self.position, _qgis.PLACEMENT)
+                    self.pal_layer.placement = self.position
 
                     if angle == 'auto2':
                         #the text may be rendered upside down
@@ -358,14 +351,14 @@ class LabelSettings(object):
     def __getMsMaxOverlapAngleLabel(self):
         # "labeling/maxCurvedCharAngleIn", "labeling/maxCurvedCharAngleOut"=-
         maxoverlapangle = float(self.mslabel.get('maxoverlapangle', 22.5))
-        self.__setSetting("maxCurvedCharAngleIn", maxoverlapangle, _qgis.PLACEMENT)
-        self.__setSetting("maxCurvedCharAngleOut", maxoverlapangle*(-1), _qgis.PLACEMENT)
+        self.pal_layer.maxCurvedCharAngleIn = maxoverlapangle
+        self.pal_layer.maxCurvedCharAngleOut = maxoverlapangle*(-1)
 
     def __getMsRepeatDistanceLabel(self):
         # "labeling/repeatDistance", "labeling/repeatDistanceUnit"=1 MM
         repeatdistance = int(self.mslabel.get('repeatdistance', 0))
         if repeatdistance:
-            self.__setSetting("repeatDistance", _ms.getSize(repeatdistance, _ms.UNIT_PIXEL), _qgis.PLACEMENT)
+            self.pal_layer.repeatDistance = _ms.getSize(repeatdistance, _ms.UNIT_PIXEL)
 
     def __getMsPositionLabel(self):
         # "labeling/placement"
@@ -374,10 +367,10 @@ class LabelSettings(object):
             self.position = QgsPalLayerSettings.AroundPoint
         else:
             if position in _ms.LABEL_POSITION:
-                self.__setSetting("quadOffset", _ms.LABEL_POSITION[position], _qgis.PLACEMENT)
+                self.pal_layer.quadOffset = _ms.LABEL_POSITION[position]
             self.position = QgsPalLayerSettings.OverPoint
 
-        self.__setSetting("placement", self.position, _qgis.PLACEMENT)
+        self.pal_layer.placement = self.position
 
     def __getMsOffsetLabel(self):
         # "labeling/dist", "labeling/xOffset", "labeling/yOffset", "labeling/offsetType=0", "labeling/labelOffsetInMapUnits"=false
@@ -386,21 +379,21 @@ class LabelSettings(object):
             xoffset = offset[0]
             yoffset = offset[1]
             if self.position == QgsPalLayerSettings.OverPoint:
-                self.__setSetting("xOffset", _ms.getSize(xoffset, _ms.UNIT_PIXEL), _qgis.PLACEMENT)
-                self.__setSetting("yOffset", _ms.getSize(yoffset, _ms.UNIT_PIXEL), _qgis.PLACEMENT)
-                self.__setSetting("labelOffsetInMapUnits", self.FALSE, _qgis.PLACEMENT)
+                self.pal_layer.xOffset = _ms.getSize(xoffset, _ms.UNIT_PIXEL)
+                self.pal_layer.yOffset = _ms.getSize(yoffset, _ms.UNIT_PIXEL)
+                self.pal_layer.offsetUnits = QgsUnitTypes.RenderPixels
             else:
                 if self.position == QgsPalLayerSettings.Curved:
                     if yoffset == 99 or yoffset == -99:
                         yoffset = xoffset #atencion al signo de xoffset, negativo abajo?
-                self.__setSetting("dist", _ms.getSize(yoffset, _ms.UNIT_PIXEL), _qgis.PLACEMENT)
-                self.__setSetting("distInMapUnits", self.FALSE, _qgis.PLACEMENT)
+                self.pal_layer.dist = _ms.getSize(yoffset, _ms.UNIT_PIXEL)
+                self.pal_layer.distUnits = QgsUnitTypes.RenderPixels
 
     def __getMsPriorityLabel(self):
         # "labeling/priority" o "labeling/dataDefined/Priority"
         priority = self.mslabel.get('priority', 5)
         if isinstance(priority, int):
-            self.__setSetting("priority", priority, _qgis.PLACEMENT)
+            self.pal_layer.priority = priority
         else:
             match_attr = _qgis.REGEX_ATTR.search(priority)
             if match_attr:
@@ -411,52 +404,52 @@ class LabelSettings(object):
         # "labeling/scaleVisibility", "labeling/scaleMin"
         minscaledenom = self.mslabel.get('minscaledenom')
         if minscaledenom:
-            self.__setSetting("scaleVisibility", self.TRUE, _qgis.RENDERING)
-            self.__setSetting("scaleMin", minscaledenom, _qgis.RENDERING)
+            self.pal_layer.scaleVisibility = True
+            self.pal_layer.minimumScale = minscaledenom
         else:
             if self.labelmaxscaledenom > 0:
-                self.__setSetting("scaleVisibility", self.TRUE, _qgis.RENDERING)
-                self.__setSetting("scaleMin", self.labelmaxscaledenom, _qgis.RENDERING)
+                self.pal_layer.scaleVisibility = True
+                self.pal_layer.minimumScale = self.labelmaxscaledenom
         #TODO self.labelmaxscaledenom ? self.labelminscaledenom ?
 
     def __getMsMaxScaleDenomLabel(self):
         # "labeling/scaleVisibility", "labeling/scaleMax"
         maxscaledenom = self.mslabel.get('maxscaledenom')
         if maxscaledenom:
-            self.__setSetting("scaleVisibility", self.TRUE, _qgis.RENDERING)
-            self.__setSetting("scaleMax", maxscaledenom, _qgis.RENDERING)
+            self.pal_layer.scaleVisibility = True
+            self.pal_layer.maximumScale = maxscaledenom
         else:
             if self.labelminscaledenom > 0:
-                self.__setSetting("scaleVisibility", self.TRUE, _qgis.RENDERING)
-                self.__setSetting("scaleMax", self.labelminscaledenom, _qgis.RENDERING)
+                self.pal_layer.scaleVisibility = True
+                self.pal_layer.maximumScale = self.labelminscaledenom
         #TODO self.labelmaxscaledenom ? self.labelminscaledenom ?
 
     def __getMsMinSizeLabel(self):
         # "labeling/fontLimitPixelSize", "labeling/fontMinPixelSize"
         minsize = int(self.mslabel.get('minsize', 4))
-        self.__setSetting("fontLimitPixelSize", self.TRUE, _qgis.RENDERING)
-        self.__setSetting("fontMinPixelSize", minsize, _qgis.RENDERING)
+        self.pal_layer.fontLimitPixelSize = True
+        self.pal_layer.fontMinPixelSize = minsize
 
     def __getMsMaxSizeLabel(self):
         # "labeling/fontLimitPixelSize", "labeling/fontMaxPixelSize"
         maxsize = int(self.mslabel.get('maxsize', 256))
-        self.__setSetting("fontMaxPixelSize", maxsize, _qgis.RENDERING)
+        self.pal_layer.fontMaxPixelSize = maxsize
 
     def __getMsMinFeatureSizeLabel(self):
         # "labeling/minFeatureSize", "labeling/fitInPolygonOnly"
         minfeaturesize = self.mslabel.get('minfeaturesize', 'auto')
         if isinstance(minfeaturesize, int):
-            self.__setSetting("minFeatureSize", _ms.getSize(minfeaturesize, _ms.UNIT_PIXEL), _qgis.RENDERING)
+            self.pal_layer.minFeatureSize = _ms.getSize(minfeaturesize, _ms.UNIT_PIXEL)
         else:
             #auto
             if self.geom_type == QgsWkbTypes.PolygonGeometry:
-                self.__setSetting("fitInPolygonOnly", self.TRUE, _qgis.PLACEMENT)
+                self.pal_layer.fitInPolygonOnly = True
 
     def __getMsForceLabel(self):
         # "labeling/displayAll"
         force = float(self.mslabel.get('force', False))
         if force:
-            self.__setSetting("displayAll", self.TRUE, _qgis.RENDERING)
+            self.pal_layer.displayAll = True
 
     #TODO
     def __getMsPartialsLabel(self):
@@ -466,14 +459,22 @@ class LabelSettings(object):
         pass
 
     #-----------------------------------------------------------------------------
-    def __getColor(self, msobject, strcolor, qsetting, qproperty):
+    def __getColor(self, msobject, strcolor, qsetting, qproperty, opacity=False):
         color = msobject.get(strcolor)
         if color:
             color_ = _qgis.color(color)
             if color_[0]:
                 self.__setdataDefined(qproperty, color_[1])
             else:
-                qsetting.setColor(color_[2])
+                if opacity:
+                    qsetting.setOpacity(color_[3])
+                    print(color_[3])
+                    c = color_[2]
+                    c.setAlpha(255)
+                    qsetting.setColor(c)
+                else:
+                    qsetting.setColor(color_[2])
+
         return color
 
     def __setdataDefined(self, qproperty, field):

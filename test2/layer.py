@@ -23,7 +23,7 @@ if lyr.labeling():
     print(pal.dataDefinedProperties().propertyKeys())
     
     txt = pal.format() #qgis._core.QgsTextFormat
-    #print(txt)
+    print(txt.setOpacity(0.5))
     
     buf = txt.buffer() #qgis._core.QgsTextBufferSettings
     #print(buf)

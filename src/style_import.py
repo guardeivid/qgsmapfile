@@ -5,7 +5,6 @@ from builtins import zip
 from builtins import object
 
 import os
-from copy import deepcopy
 from qgis.core import (
     QgsSingleSymbolRenderer,
     QgsCategorizedSymbolRenderer,
@@ -13,14 +12,16 @@ from qgis.core import (
     QgsGraduatedSymbolRenderer,
     QgsRuleBasedRenderer,
     QgsRendererRange,
-    QgsRendererCategory
+    QgsRendererCategory,
+    QgsVectorLayerSimpleLabeling,
+    QgsPalLayerSettings,
+    QgsRuleBasedLabeling
 )
-from qgis.utils import Qgis
-from .utils import (_ms, _qgis, Util)
+from .utils import _ms
 from .symbol_import import SymbolImport
 from .label_import import LabelSettings
 from .expression_import import Expression
-from .file_management import FileManagement
+#from .file_management import FileManagement
 
 
 class StyleImport(object):
@@ -54,6 +55,9 @@ class StyleImport(object):
         self.__getLabelProps()
 
         label = self.getLabel()
+        if label:
+            self.qgslayer.setLabelsEnabled(True)
+            self.qgslayer.setLabeling(label)
 
         #STYLE
         #classes = self.mslayer.get("classes", 0)
@@ -67,8 +71,10 @@ class StyleImport(object):
         self.has_expression = self.__hasExpression()
 
         renderer = self.getRenderer()
-        if renderer != False:
+        if renderer:
             self.qgslayer.setRenderer(renderer)
+
+        # self.qgslayer.triggerRepaint()
 
     def getRenderer(self):
         """docstring for getRenderer"""
@@ -282,60 +288,53 @@ class StyleImport(object):
     #--Obtener tipo de label-----------------------------------------------
     def __getSingleLabel(self):
         """docstring for __getSingleLabel"""
-        """
-        label = QgsPalLayerSettings();label.readFromLayer(layer)
-        #label.isExpression = True;label.enabled = True
-        label.drawLabels = True;label.fieldName = 'gid'
-        label.writeToLayer(layer);iface.mapCanvas().refresh()
-        """
         obj = self.labels[0]
         msclass = obj["class"]
         mslabel = obj["label"]
 
-        #old version
-        props = list(_qgis.LABELING_DEFAULT_OLD)
         Label = LabelSettings(self.qgslayer, self.geom_type, self.has_labelitem, \
         self.labelminscaledenom, self.labelmaxscaledenom, self.fontset, \
-        msclass, mslabel, props, self.sizeunits, is_rule=False)
+        msclass, mslabel, self.sizeunits)
 
-        #TODO q3 return, ya que seria QgsPalLayerSettings
-        Label.getLabel()
+        palyr = Label.getLabel()
+        return QgsVectorLayerSimpleLabeling(palyr)
 
     def __getRuleBasedLabel(self):
         """docstring for __getRuleBasedLabel"""
         expressions = self.__getLabelExpressions()
-        root = deepcopy(_qgis.LABELING_RULES)
-        root["version"] = Qgis.QGIS_VERSION
-        root_rule = root["labeling"]["rules"]
+        root_rule = QgsRuleBasedLabeling.Rule(QgsPalLayerSettings())
         for exp, msobject in zip(expressions[::-1], self.labels[::-1]):
-            rule = deepcopy(_qgis.LABELING_RULE)
             msclass = msobject["class"]
             mslabel = msobject["label"]
             name = msclass.get('name')
 
+            Label = LabelSettings(
+                self.qgslayer,
+                self.geom_type,
+                self.has_labelitem,
+                self.labelminscaledenom,
+                self.labelmaxscaledenom,
+                self.fontset,
+                msclass,
+                mslabel,
+                self.sizeunits
+            )
+            palyr = Label.getLabel()
+
+            rule = QgsRuleBasedLabeling.Rule(palyr)
+
             if name:
-                rule["description"] = name
+                rule.setDescription(name)
             if exp[0] != Expression.TYPE_UNKNOWN:
-                rule["filter"] = Util.escape_xml(exp[1])
+                rule.setFilterExpression(exp[1])
             if self.labelminscaledenom != -1:
-                rule["scalemaxdenom"] = self.labelminscaledenom
+                rule.setMaximumScale(self.labelminscaledenom)
             if self.labelmaxscaledenom != -1:
-                rule["scalemindenom"] = self.labelmaxscaledenom
+                rule.setMinimumScale(self.labelmaxscaledenom)
 
-            Label = LabelSettings(self.qgslayer, self.geom_type, self.has_labelitem, \
-                self.labelminscaledenom, self.labelmaxscaledenom, self.fontset, \
-                msclass, mslabel, rule, self.sizeunits, is_rule=True)
-            Label.getLabel()
-            root_rule.append(rule)
+            root_rule.appendChild(rule)
 
-        #solo para q2
-        #generar un xml con root_rule y guardar el xml en archivo qml
-        qml = FileManagement.createXml(root, fileName=self.mslayer["name"], ext='qml', pretty=True)
-        #cargar qml a la capa
-        self.qgslayer.loadNamedStyle(qml)
-        #eliminar archivo tmp
-        os.remove(qml)
-        #TODO q3 return, ya que seria QgsPalLayerSettings
+        return QgsRuleBasedLabeling(root_rule)
 
     #--Obtener tipo de renderer--------------------------------------------
     def __getSingleSymbolRenderer(self):
