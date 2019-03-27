@@ -4,6 +4,4 @@ call "C:\OSGeo4W64\bin\qt5_env.bat"
 call "C:\OSGeo4W64\bin\py3_env.bat"
 
 @echo on
-rem pylupdate5 i18n/qgsmapfile.pro
-
-lrelease i18n/es.ts
+pylupdate5 i18n/QgsMapfile.pro

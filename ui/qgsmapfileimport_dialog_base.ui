@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>QgsMapfileImportDialogBase</class>
  <widget class="QDialog" name="QgsMapfileImportDialogBase">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>426</width>
+    <height>366</height>
+   </rect>
+  </property>
   <property name="minimumSize">
    <size>
     <width>426</width>
@@ -46,7 +54,10 @@
     </rect>
    </property>
    <property name="title">
-    <string>Get paths from the main Mapfile (layers are declared with INCLUDE)</string>
+    <string>Get paths from the main Mapfile</string>
+   </property>
+   <property name="checkable">
+    <bool>false</bool>
    </property>
    <widget class="QToolButton" name="btnMainMapfilePath">
     <property name="geometry">
@@ -84,7 +95,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Main Mapfile (* .map) (MAP ... END)</string>
+     <string>(MAP ... END) (layers are declared with INCLUDE)</string>
     </property>
     <property name="buddy">
      <cstring>txtMapfilePath</cstring>
@@ -261,7 +272,7 @@
    </property>
    <property name="font">
     <font>
-     <pointsize>9</pointsize>
+     <pointsize>10</pointsize>
      <weight>75</weight>
      <bold>true</bold>
     </font>

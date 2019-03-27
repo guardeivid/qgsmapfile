@@ -26,12 +26,12 @@ from .fontset import FontSet
 from .style_import import StyleImport
 
 class MapfileImport(object):
-    FROM_PATHS_MAPFILE = self.tr('(from mapfile)')
-    FROM_PATHS_MEMORY = self.tr('(from cache)')
 
     """docstring for MapfileImport"""
     def __init__(self, iface, mapfilepath="", auto=False):
         super(MapfileImport, self).__init__()
+        self.FROM_PATHS_MAPFILE = self.tr('(from mapfile)')
+        self.FROM_PATHS_MEMORY = self.tr('(from cache)')
         self.iface = iface
         self.mapfiledir = ''
         self.setMapfilePath(mapfilepath)
@@ -626,7 +626,7 @@ class MapfileImport(object):
             qgslayer = QgsVectorLayer(path, name, provider)
 
         if not qgslayer.isValid():
-            self.iface.messageBar().pushWarning('Error', self.tr("The layer {} does not have a valid path {}".format(name, path)))
+            self.iface.messageBar().pushWarning('Error', self.tr("The layer {} does not have a valid path {}").format(name, path))
             return False
 
         self.setScaleBasedVisibility(mslayer, qgslayer)
@@ -644,7 +644,7 @@ class MapfileImport(object):
             addedlayer = QgsProject.instance().addMapLayer(qgslayer)
 
         if not addedlayer:
-            self.iface.messageBar().pushWarning('Error', "The layer {} could not be added to the map".format(name))
+            self.iface.messageBar().pushWarning('Error', self.tr("The layer {} could not be added to the map").format(name))
             return False
 
         self.setStatus(qgslayer, mslayer)
