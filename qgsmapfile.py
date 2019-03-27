@@ -152,20 +152,20 @@ class QgsMapfile(object):
         icon_path = ':/plugins/QgsMapfile/icon.png'
         self.add_action(
             ':/plugins/QgsMapfile/img/add.png',
-            text=self.tr(u'Añadir capa MapServer (Mapfile)'),
+            text=self.tr(u'Add MapServer Layer (Mapfile)'),
             callback=self.importLayer,
             parent=self.iface.mainWindow())
 
         '''
         self.add_action(
             ':/plugins/QgsMapfile/img/export.png',
-            text=self.tr(u'Exportar capa a MapServer (Mapfile)'),
+            text=self.tr(u'Export Mapserver layer (Mapfile)'),
             callback=self.exportLayer,
             parent=self.iface.mainWindow())
 
         self.add_action(
             icon_path,
-            text=self.tr(u'Acerca de Qgis Mapfile'),
+            text=self.tr(u'About Qgis Mapfile'),
             callback=self.about,
             parent=self.iface.mainWindow(),
             add_to_toolbar=False)

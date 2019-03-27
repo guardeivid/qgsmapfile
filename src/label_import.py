@@ -468,7 +468,6 @@ class LabelSettings(object):
             else:
                 if opacity:
                     qsetting.setOpacity(color_[3])
-                    print(color_[3])
                     c = color_[2]
                     c.setAlpha(255)
                     qsetting.setColor(c)

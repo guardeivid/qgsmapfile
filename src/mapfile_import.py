@@ -11,7 +11,7 @@ import os
 import urllib.request, urllib.parse, urllib.error
 import mappyfile
 
-from qgis.PyQt.QtCore import QSettings
+from qgis.PyQt.QtCore import QSettings, QCoreApplication
 from qgis.core import (
     QgsProject,
     QgsWkbTypes,
@@ -26,8 +26,8 @@ from .fontset import FontSet
 from .style_import import StyleImport
 
 class MapfileImport(object):
-    FROM_PATHS_MAPFILE = u'(en mapfile)'
-    FROM_PATHS_MEMORY = u'(en memoria)'
+    FROM_PATHS_MAPFILE = self.tr('(from mapfile)')
+    FROM_PATHS_MEMORY = self.tr('(from cache)')
 
     """docstring for MapfileImport"""
     def __init__(self, iface, mapfilepath="", auto=False):
@@ -54,26 +54,15 @@ class MapfileImport(object):
 
         self.from_paths = ''
         self.root = QgsProject.instance().layerTreeRoot()
-        #devuelve q2 QgsLayerTreeGroup q3 QgsLayerTree que hereda todo de QgsLayerTreeGroup
 
         #self.iconsetpath = ''
         #self.reliconsetpath = ''
 
-        if self.isSetPath() and auto:
+        if auto:
             self.run()
 
-    #def tr(self, message):
-        """Get the translation for a string using Qt translation API.
-
-        We implement this ourselves since we do not inherit QObject.
-
-        :param message: String for translation.
-        :type message: str, QString
-
-        :returns: Translated version of message.
-        :rtype: QString
-        """
-        #return QCoreApplication.translate('QgsMapfile', message)
+    def tr(self, message):
+        return QCoreApplication.translate('QgsMapfile', message)
 
     def isSetPath(self):
         """docstring for isSetPath"""
@@ -86,20 +75,20 @@ class MapfileImport(object):
             if os.path.isfile(mapfilepath):
                 self.mapfiledir = os.path.dirname(mapfilepath)
 
-    def __setMainPaths(self):
-        shapepath = self.getNormPath(self.mapfile.get("shapepath", ''))
+    def __setMainPaths(self, mapyfile):
+        shapepath = self.getNormPath(mapyfile.get("shapepath", ''))
         if shapepath:
             self.shapepath = Util.abspath(self.mapfiledir, '', shapepath)
             self.setRelShapePath()
 
-        symbolsetpath = self.getNormPath(self.mapfile.get("symbolset", ''))
+        symbolsetpath = self.getNormPath(mapyfile.get("symbolset", ''))
         if symbolsetpath:
             self.symbolsetpath = Util.abspath(self.mapfiledir, '', symbolsetpath)
             self.setRelSymbolsetPath()
             s = SymbolSet(self.iface, self.symbolsetpath)
             self.symbols = s.get()
 
-        fontsetpath = self.getNormPath(self.mapfile.get("fontset", ''))
+        fontsetpath = self.getNormPath(mapyfile.get("fontset", ''))
         if fontsetpath:
             self.fontsetpath = Util.abspath(self.mapfiledir, '', fontsetpath)
             self.setRelFontsetPath()
@@ -172,7 +161,7 @@ class MapfileImport(object):
                 return True
             return False
         except Exception as e:
-            self.iface.messageBar().pushWarning(u'Error', str(e))
+            self.iface.messageBar().pushWarning('Error', str(e))
             return False
 
     def readMainMapFile(self, mapfilepath):
@@ -181,16 +170,15 @@ class MapfileImport(object):
             mapyfile = mappyfile.open(mapfilepath, expand_includes=False)
             _type = mapyfile.get("__type__")
             if _type == 'map':
-                self.mapfile = mapyfile
                 self.setMapfilePath(mapfilepath)
-                self.__setMainPaths()
+                self.__setMainPaths(mapyfile)
                 self.__savePaths()
                 self.from_paths = self.FROM_PATHS_MAPFILE
                 return True
             else:
                 return False
         except Exception as e:
-            self.iface.messageBar().pushWarning(u'Error', str(e))
+            self.iface.messageBar().pushWarning('Error', str(e))
             return False
 
     def getLayers(self):
@@ -198,7 +186,7 @@ class MapfileImport(object):
         _type = self.mapfile.get("__type__")
         self.map_type = _type
         if _type == 'map':
-            self.__setMainPaths()
+            self.__setMainPaths(self.mapfile)
             self.__savePaths()
             self.from_paths = self.FROM_PATHS_MAPFILE
             layers = self.mapfile.get("layers")
@@ -208,6 +196,7 @@ class MapfileImport(object):
             self.layers = [self.mapfile]
             self.__getSavedPaths()
             self.from_paths = self.FROM_PATHS_MEMORY
+        self.mapfile = {}
 
     #TODO permitir capas OGR
     def parse(self):
@@ -637,7 +626,7 @@ class MapfileImport(object):
             qgslayer = QgsVectorLayer(path, name, provider)
 
         if not qgslayer.isValid():
-            self.iface.messageBar().pushWarning(u'Error', u"El layer {} no es valido path {}".format(name, path))
+            self.iface.messageBar().pushWarning('Error', self.tr("The layer {} does not have a valid path {}".format(name, path)))
             return False
 
         self.setScaleBasedVisibility(mslayer, qgslayer)
@@ -655,7 +644,7 @@ class MapfileImport(object):
             addedlayer = QgsProject.instance().addMapLayer(qgslayer)
 
         if not addedlayer:
-            self.iface.messageBar().pushWarning(u'Error', u"El layer {} no se pudo agregar al mapa".format(name))
+            self.iface.messageBar().pushWarning('Error', "The layer {} could not be added to the map".format(name))
             return False
 
         self.setStatus(qgslayer, mslayer)
@@ -691,8 +680,7 @@ class MapfileImport(object):
     def setStatus(self, qgslayer, mslayer):
         status = (mslayer.get('status', 'on')).lower()
         if status == 'off':
-            QgsProject.instance().layerTreeRoot().findLayer(qgslayer.id()).setItemVisibilityChecked(False)
-
+            self.root.findLayer(qgslayer.id()).setItemVisibilityChecked(False)
 
     def setCustomProperty(self, qgslayer, mslayer):
         #TODO Guardar propiedades separadas en la capa, ya que al cargar un proyecto no conserva

@@ -1,7 +1,6 @@
-FORMS = ../ui/qgsmapfileexport_dialog_base.ui \
-../ui/qgsmapfileimport_dialog_base.ui
+FORMS = ../ui/qgsmapfileimport_dialog_base.ui
 
-SOURCES = ../ui/qgsmapfileexport_dialog.py \
-../ui/qgsmapfileimport_dialog.py
+SOURCES = ../ui/qgsmapfileimport_dialog.py \
+../qgsmapfile.py ../src/mapfile_import.py
 
-TRANSLATIONS = en.ts
+TRANSLATIONS = es.ts
