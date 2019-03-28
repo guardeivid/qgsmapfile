@@ -10,10 +10,10 @@ GNU General Public License version 2
 
 
 ### REQUERIMENTS for it to work correctly:
-
+```sh
 pip install mappyfile
 pip install matplotlib
-
+```
 
 ### NOTES:
 
@@ -31,15 +31,15 @@ It allows to add vector layers of different geometric types (Points, Lines and P
 Filters and expressions are one of the biggest difficulties in converting between Mapserver and Qgis, due to their large number of variants, so not all cases are supported.
 
 Types of expressions supported:
--String comparisons
--Regular expression comparison
--List expressions
--Logical MapServer expressions
--  Logical expressions
--  String expressions that return to logical value
--  Arithmetic expressions that return to logical value
--  String operations that return to string
--  Functions that return to string (tostring, upper, lower, initcap)
+- String comparisons
+- Regular expression comparison
+- List expressions
+- Logical MapServer expressions
+	- Logical expressions
+	- String expressions that return to logical value
+	- Arithmetic expressions that return to logical value
+	- String operations that return to string
+	- Functions that return to string (tostring, upper, lower, initcap)
 
 
 #### FORMATS
@@ -106,24 +106,25 @@ Qgis translatable settings:
 - Text format
 - Text buffer
 - Text background with rectangle shape (if have CLASS GEOTRANSFORM 'labelpoly')
-     "Shape size" (if have CLASS WITH and COLOR equal OUTLINECOLOR)
+	- "Shape size" (if have CLASS WITH and COLOR equal OUTLINECOLOR)
 - Text shadow (if exists "shape size" and other CLASS OFFSET)
 - Placement
 - Renderer
+
 
 #### FONTS
 
 The fonts if they are installed in the system can be recognized, as long as the path to the FONSET file is specified.
 
 
+### Developement
 
-###
-This plugin is experimental and there are many features that have not yet been implemented
+This plugin is experimental and there are many features that have not yet been implemented.
 
 
-### Contact:
+### Author:
 
-David Orellano guardeivid@yahoo.com.ar
+- David Orellano [@guardeivid](https://github.com/guardeivid)
 
 
 ### Acknowledgments
