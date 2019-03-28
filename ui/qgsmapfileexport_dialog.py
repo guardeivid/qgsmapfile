@@ -3,7 +3,7 @@
 /***************************************************************************
  QgsMapfileExportDialog
                                  A QGIS plugin
- Este plugin permite importar y exportar archivos mapfile (map, lay), especialmente para la definiciion de una capa
+
                              -------------------
         begin                : 2018-08-04
         git sha              : $Format:%H$

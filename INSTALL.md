@@ -62,6 +62,8 @@ C:\OSGeo4W\apps\Python36\Scripts\pyrcc5.bat -o resources.py resources.qrc
 
 cd C:\Users\User\AppData\Roaming\QGIS\QGIS3\profiles\default\python\plugins\QgsMapfile
 
+##### Generar archivo de recursos
+**`p.bat`**
 ```batch
 @echo off
 call "C:\OSGeo4W\bin\o4w_env.bat"
@@ -70,4 +72,48 @@ call "C:\OSGeo4W\bin\py3_env.bat"
 
 @echo on
 pyrcc5 -o resources.py resources.qrc
+```
+
+##### Generar y/o actualizar archivos de traduccion
+**`t.bat`**
+```batch
+@echo off
+call "C:\OSGeo4W64\bin\o4w_env.bat"
+call "C:\OSGeo4W64\bin\qt5_env.bat"
+call "C:\OSGeo4W64\bin\py3_env.bat"
+
+@echo on
+pylupdate5 i18n/QgsMapfile.pro
+```
+
+##### No moduled resources
+Comentar en los archivos ui el tag **`resources`**
+```xml
+ <!-- <resources>
+  <include location="../resources.qrc"/>
+ </resources>-->
+ ```
+
+##### Distribuir
+No incluir:
+- Imagenes no utilizadas
+- Archivos generadores de archivos
+- Carpetas de pruebas o scrips de desarrollo
+- Archivos compilados
+- Archivo de configuracion `settings.db`
+```txt
+|-.git/
+|-img/
+|-test/
+|-test2/
+|-tests/
+|- __pycache__/
+|-src/
+|   |- __pycache__/
+|   |-settings.db
+|-ui/
+|   |- __pycache__/
+|-INSTALL.md
+|-makefile
+|-.gitignore
 ```

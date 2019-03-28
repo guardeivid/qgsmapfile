@@ -2,9 +2,41 @@
 
 <img src="https://github.com/guardeivid/qgsmapfile/raw/master/icon.png" width="64px" />
 
-This plugin helps import a Mapserver Mapfile in a Qgis Project, for now.
 
 Version 0.1.0 - March 2019
+
+This plugin helps import a Mapserver Mapfile in a Qgis Project, for now.
+
+You can import the definition of a layer:
+```map
+MAP
+    ...
+    LAYER ...
+    END
+    ...
+END
+
+# or
+
+LAYER ...
+END
+```
+
+Or the definition of multiple layers:
+```map
+MAP
+    ...
+    LAYER ...
+    END
+
+    LAYER ...
+    END
+    ...
+END
+```
+
+If import one layer (LAYER ... END) (the layers are declared with INCLUDE), then specify the main mapfile to obtain the paths (SHAPEPATH, FONTSET, SYMBOLSET) only once, later they are obtained from the cache.
+
 
 ### Licence
 
