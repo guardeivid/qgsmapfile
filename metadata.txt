@@ -1,14 +1,23 @@
 [general]
 name=Qgs Mapfile
 qgisMinimumVersion=3.0
-description=Importar archivo Mapfile (MapServer) a un proyecto QGIS
+description=This plugin helps import a Mapserver Mapfile in a Qgis Project
 version=0.1.0
 author=David Orellano
 email=guardeivid@yahoo.com.ar
 
-about=Este plugin permite importar archivos Mapfile (.map, .lay) de MapServer a un proyecto QGIS 3.x.
+about=This plugin helps import a Mapserver Mapfile (.map, .lay) in a Qgis Project 3.x.
+    You can import the definition of a layer (MAP ... LAYER ... END ... END, LAYER .. END) or the definition of multiple layers (MAP ... LAYER ... END ... END).
 
-    Permite importar archivos con la definición de una única capa (LAYER .. END) o con la definición completa de múltiples capas (MAP ... LAYER ... END ... END).
+    Qgis and Mapserver are not completely compatible, but even so, we have tried to find the highest degree of common attributes allowing a similarity in the views in the different environments.
+    Mapfiles are expected to be UTF-8 encoded.
+    It is compatible with Mapserver Mapfiles versions >= 6.
+    It allows to add vector layers of different geometric types (Points, Lines and Polygons) and raster layers (not styled).
+    <b>Requeriments</b>
+    pip install mappyfile
+    pip install matplotlib
+    <b>Licence</b>
+    GNU General Public License version 2 or above
 
 tracker=https://github.com/guardeivid/qgsmapfile/issues
 repository=https://github.com/guardeivid/qgsmapfile
@@ -19,7 +28,7 @@ repository=https://github.com/guardeivid/qgsmapfile
 
 # changelog=
 
-tags=mapfile, qgis, mapserver, import, webserver, importer, converter, layers, python
+tags=mapfile,qgis,mapserver,import,webserver,importer,converter,layers,python
 homepage=https://github.com/guardeivid/qgsmapfile
 category=Web
 icon=icon.png
