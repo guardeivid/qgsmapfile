@@ -1,4 +1,6 @@
-# qgsmapfile
+# QgsMapfile
+
+<img src="https://github.com/guardeivid/qgsmapfile/raw/master/icon.png" width="64px" />
 
 This plugin helps import a Mapserver Mapfile in a Qgis Project, for now.
 
@@ -6,12 +8,62 @@ Version 0.1.0 - March 2019
 
 ### Licence
 
-GNU General Public License version 2
+GNU General Public License version 2 or above
 
 
 ### REQUERIMENTS for it to work correctly:
 ```sh
 pip install mappyfile
+pip install matplotlib
+```
+
+#### Installation
+
+##### Windows
+
+1. Execute shell OSGEO4W **`OSGeo4W.bat`**
+
+In a Qgis Standalone installation, the access is in the directory `C:\Program Files\QGIS 3.xx`
+
+In an advanced installation, the shortcut is in the selected installation directory, usually `C:\OSGeo4W`
+
+2. Load environment variables
+```sh
+py3_env
+```
+
+3. If `pip` is not installed, you must first install it.
+
+    - Download [get-pip.py](https://bootstrap.pypa.io/get-pip.py) to a folder on your computer.
+    - Open a command prompt and navigate to the folder containing get-pip.py.
+    - Run the following command:
+    ```sh
+    python3 get-pip.py
+    ```
+    - Verify that Pip was installed correctly by opening a command prompt and entering the following command:
+    ```sh
+    pip -V
+    ```
+
+4. Update `pip` (optional)
+```sh
+python3 -m pip install --upgrade pip
+```
+
+5. Installing packages:
+```sh
+python3 -m pip install mappyfile
+# o
+pip install mappyfile
+```
+
+6. Update package `mappyfile` (optional)
+```sh
+python3 -m pip install --upgrade mappyfile
+```
+
+7. Install matplotlib
+```sh
 pip install matplotlib
 ```
 
@@ -117,9 +169,11 @@ Qgis translatable settings:
 The fonts if they are installed in the system can be recognized, as long as the path to the FONSET file is specified.
 
 
-### Developement
+### Developement, Help & Support
 
-This plugin is experimental and there are many features that have not yet been implemented.
+This plugin is experimental and there are many features that have not yet been implemented. Please contact me with any questions you may have about the plugin or with suggestons for further development.
+
+The GitHub repository can also be used to log issues and suggest enhancements - [https://github.com/guardeivid/qgsmapfile/issues](https://github.com/guardeivid/qgsmapfile/issues)
 
 
 ### Author:
