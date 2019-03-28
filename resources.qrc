@@ -1,13 +1,13 @@
 <RCC>
   <qresource prefix="/plugins/QgsMapfile">
-    <file>img/mActionAddOgrLayer.svg</file>
+    <!--<file>img/mActionAddOgrLayer.svg</file>
     <file>img/mActionAddPostgisLayer.svg</file>
     <file>img/mActionAddRasterLayer.svg</file>
     <file>img/mActionAddSpatiaLiteLayer.svg</file>
     <file>img/mActionAddWfsLayer.svg</file>
     <file>img/mActionAddWmsLayer.svg</file>
     <file>img/general.svg</file>
-    <file>img/mActionDataSourceManager.svg</file>
+    <file>img/mActionDataSourceManager.svg</file>-->
     <file>img/add.png</file>
     <file>img/export.png</file>
     <file>icon.png</file>
