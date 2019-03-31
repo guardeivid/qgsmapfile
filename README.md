@@ -3,7 +3,7 @@
 <img src="https://github.com/guardeivid/qgsmapfile/raw/master/icon.png" width="64px" />
 
 
-Version 0.1.0 - March 2019
+Version 0.1.1 - March 2019
 
 This plugin helps import a Mapserver Mapfile in a Qgis Project, for now.
 
@@ -119,6 +119,7 @@ Types of expressions supported:
 - Regular expression comparison
 - List expressions
 - Logical MapServer expressions
+
 	- Logical expressions
 	- String expressions that return to logical value
 	- Arithmetic expressions that return to logical value
@@ -175,7 +176,7 @@ For poligons
 If the path to the SYMBOLSET file is set, you can try to convert the symbol definition into one of the following formats
 - Qgis markers well know (vector)
 - Marker arrow (vector)
-- SVG (types svg, url, file, vector not marker well know, ellipse, pixmap)
+- SVG (types svg, vector not marker well know, ellipse)
 - Font marker (truetype)
 
 
