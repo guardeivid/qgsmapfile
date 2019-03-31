@@ -16,7 +16,7 @@ MAP
       END
       LABEL
         TYPE TRUETYPE
-        FONT "Candara"
+        FONT "candara"
         COLOR '#00000020'
         SIZE 12
         POSITION CL

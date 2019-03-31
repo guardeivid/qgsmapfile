@@ -10,10 +10,6 @@ from tempfile import gettempdir
 from .utils import (_ms, _qgis, Util)
 
 class FileManagement(object):
-    """docstring for FileManagement"""
-    def __init__(self, arg):
-        super(FileManagement, self).__init__()
-        self.arg = arg
 
     @staticmethod
     def createDir(name):

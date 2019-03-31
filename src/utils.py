@@ -515,24 +515,3 @@ class Util(object):
                     map_ = m + '&'
                     break
         return "{}?{}".format(uri[0], map_)
-
-'''
-print(_mapserver.TYPE_POLYGON)
-
-qc = QColor("#ee4507")
-qc.setAlpha(10)
-
-qc = QColor(145, 25, 85, 41)
-
-ms = _mapserver()
-print(ms.color(qc))
-
-
-print(_qgis.TYPE_POLYGON)
-qg = _qgis()
-mscolor = [154, 245, 78]
-mscolor = '#12451212'
-mscolor = 'blue'
-print qg.color(mscolor, 50).name()
-print qg.color(mscolor, 50).alpha()
-'''

@@ -20,11 +20,12 @@ from qgis.core import (
 from .utils import (_ms, _qgis, Util)
 from .expression_import import Expression
 
+
 class LabelSettings(object):
 
     """docstring for LabelSettings"""
     def __init__(self, qgslayer, geom_type, labelitem, labelminscaledenom, \
-        labelmaxscaledenom, fontset, msclass, mslabel, sizeunits):
+                 labelmaxscaledenom, fontset, msclass, mslabel, sizeunits):
         super(LabelSettings, self).__init__()
         self.qgslayer = qgslayer
         self.geom_type = geom_type
@@ -132,7 +133,7 @@ class LabelSettings(object):
             Expr = Expression(text, self.labelitem, True)
             (exp_type, text) = Expr.type()
 
-        self.pal_layer.fieldName = text
+        self.pal_layer.fieldName = text if text else ''
 
     def __getMsFontLabel(self):
         # "labeling/fontFamily", "labeling/namedStyle"=Normal o "labeling/dataDefined/Family"
@@ -162,9 +163,12 @@ class LabelSettings(object):
             if match_attr:
                 self.__setdataDefined(QgsPalLayerSettings.Size, match_attr.group(1))
             else:
-                #TODO for Bitmap Fonts
-                #tiny|small|medium|large|giant
+                # TODO for Bitmap Fonts
+                # tiny|small|medium|large|giant
                 pass
+
+                # TODO LAYER SYMBOLSCALEDENOM
+                # map scale SIZE * 1:SYMBOLSCALEDENOM
 
         self.text_format.setSizeUnit(QgsUnitTypes.RenderPixels)
         self.text_format.setSize(size)
