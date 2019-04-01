@@ -89,3 +89,5 @@ class QgsMapfileImportDialog(QDialog, FORM_CLASS):
                 for layer in self.mf.layers:
                     self.mf.addLayer(layer)
                 self.close()
+            else:
+                self.iface.messageBar().pushWarning(self.tr('Warning'), self.tr("There are no supported layers to load"))

@@ -204,37 +204,39 @@ class MapfileImport(object):
         for layer in self.layers:
             layer["config"] = {}
             connectiontype = self.getConnectionType(layer)
+            self.getConfig(layer, connectiontype)
             if connectiontype == _ms.CONNTYPE_LOCAL:
-                self.getConfig(layer, connectiontype, _qgis.ICON_OGR)
-                if layer["config"]["type"] == _qgis.TYPE_RASTER:
-                    layer["config"]["icon"] = _qgis.ICON_GRID
+                continue
             elif connectiontype == _ms.CONNTYPE_POSTGIS:
                 layer["config"] = self.parseDataPostgis(layer.get('data', ['']))
                 fromsource = layer["config"]["fromsource"]
-                if not self.isValidSource(fromsource):
-                    self.layers.remove(layer)
+                if self.isValidPostgisSource(fromsource):
+                    layer["config"]["schema"], layer["config"]["table"] = self.findTableFromSource(fromsource)
+                    layer["config"]["sql"] = self.getLayerFilter(layer)
                     continue
-                layer["config"]["schema"], layer["config"]["table"] = self.findTableFromSource(fromsource)
-                layer["config"]["sql"] = self.getLayerFilter(layer)
-                self.getConfig(layer, connectiontype, _qgis.ICON_POSTGIS)
+            elif connectiontype == _ms.CONNTYPE_OGR:
+                connection = self.getConnection(layer)
+                ext = Util.getFileExtension(connection)
+                if ext in _ms.EXTENSIONS_OGR:
+                    layer['config']['ext'] = ext[1:]
+                    continue
             elif connectiontype == _ms.CONNTYPE_WMS:
                 (layer["config"], isValid) = self.parseDataWms(layer)
-                if not isValid:
-                    self.layers.remove(layer)
+                if isValid:
                     continue
-                self.getConfig(layer, connectiontype, _qgis.ICON_WMS)
             elif connectiontype == _ms.CONNTYPE_WFS:
                 (layer["config"], isValid) = self.parseDataWfs(layer)
-                if not isValid:
-                    self.layers.remove(layer)
+                if isValid:
                     continue
-                self.getConfig(layer, connectiontype, _qgis.ICON_WFS)
-            else:
-                self.layers.remove(layer)
+
+            self.layers.remove(layer)
 
     def getConnectionType(self, layer):
         """docstring for getConncectionType"""
         return layer.get('connectiontype', 'local').lower()
+
+    def getConnection(self, layer):
+        return layer.get('connection', '')
 
     #POSTGIS###################################################
     def parseDataPostgis(self, data):
@@ -302,14 +304,14 @@ class MapfileImport(object):
 
         return (schema, table)
 
-    def isValidSource(self, fromsource):
+    def isValidPostgisSource(self, fromsource):
         """docstring for isValidSource"""
         return _ms.REGEX_SOURCE_POSTGIS.search(fromsource)
 
     #WFS#######################################################
     def parseDataWfs(self, layer):
         NO_VALID = (False, False)
-        url = layer.get('connection', '')
+        url = self.getConnection(layer)
         metadata = layer.get('metadata', '')
         if not url or not metadata:
             return NO_VALID
@@ -369,7 +371,7 @@ class MapfileImport(object):
     #WMS#######################################################
     def parseDataWms(self, layer):
         NO_VALID = (False, False)
-        url = layer.get('connection', '')
+        url = self.getConnection(layer)
         metadata = layer.get('metadata', '')
         if not url or not metadata:
             return NO_VALID
@@ -518,11 +520,10 @@ class MapfileImport(object):
                 title = metadata["description"]
         return title
 
-    def getConfig(self, layer, connectiontype, icon):
+    def getConfig(self, layer, connectiontype):
         layer["config"]["title"] = self.getLayerTitle(layer)
         layer["config"]["connectiontype"] = connectiontype
         layer["config"]["geomtype"], layer["config"]["type"] = self.getLayerType(layer)
-        layer["config"]["icon"] = icon
 
     #PATHS#####################################################
     def __getPostgisPath(self, mslayer):
@@ -548,8 +549,6 @@ class MapfileImport(object):
         """docstring for __getLocalPath"""
         data = mslayer.get("data", '')
         path = mslayer["config"].get("shapepath", '')
-        #TODO permitir kml, kmz, gpx, sqlite
-        #conn = mslayer.get('connection', '')
 
         if not data:
             return None
@@ -561,19 +560,29 @@ class MapfileImport(object):
                 data += ".shp"
 
         fullpath = Util.abspath(self.mapfilepath, path, data)
-        (filepath, ext) = os.path.splitext(fullpath)
+        ext = Util.getFileExtension(fullpath)
 
         if ext in _ms.EXTENSIONS:
             return fullpath
 
         return None
 
-    def __getWfsPath(self, mslayer):
-        """docstring for __getWfsPath"""
-        return mslayer["config"]["uri"]
+    def __getOgrPath(self, mslayer):
+        """docstring for __getOgrPath"""
+        shapepath = mslayer["config"].get("shapepath", '')
+        extension = mslayer["config"].get("ext", '')
+        connection = self.getConnection(mslayer)
+        # TODO allow kml, kmz, gpx, sqlite
 
-    def __getWmsPath(self, mslayer):
-        """docstring for __getWmsPath"""
+        fullpath = Util.abspath(self.mapfilepath, shapepath, connection)
+        #print(fullpath)
+        if extension in ('geojson', 'json'):
+            return fullpath
+
+        data = mslayer.get("data", '')
+
+    def __getUri(self, mslayer):
+        """docstring for __getUri"""
         return mslayer["config"]["uri"]
 
     ###########################################################
@@ -596,16 +605,16 @@ class MapfileImport(object):
             if connectiontype == _ms.CONNTYPE_LOCAL:
                 return self.__addLayer(self.__getLocalPath(mslayer), mslayer, _qgis.CONNTYPE_GDAL, True)
             elif connectiontype == _ms.CONNTYPE_WMS:
-                return self.__addLayer(self.__getWmsPath(mslayer), mslayer, _qgis.CONNTYPE_WMS, True)
+                return self.__addLayer(self.__getUri(mslayer), mslayer, _qgis.CONNTYPE_WMS, True)
         else:
             if connectiontype == _ms.CONNTYPE_POSTGIS:
                 return self.__addLayer(self.__getPostgisPath(mslayer), mslayer, _qgis.CONNTYPE_POSTGIS)
             elif connectiontype == _ms.CONNTYPE_LOCAL:   #Shapefile por defecto, no tiene extension
                 return self.__addLayer(self.__getLocalPath(mslayer, True), mslayer, _qgis.CONNTYPE_OGR)
             elif connectiontype == _ms.CONNTYPE_OGR:
-                return self.__addLayer(self.__getLocalPath(mslayer), mslayer, _qgis.CONNTYPE_OGR)
+                return self.__addLayer(self.__getOgrPath(mslayer), mslayer, _qgis.CONNTYPE_OGR)
             elif connectiontype == _ms.CONNTYPE_WFS:
-                return self.__addLayer(self.__getWfsPath(mslayer), mslayer, _qgis.CONNTYPE_WFS)
+                return self.__addLayer(self.__getUri(mslayer), mslayer, _qgis.CONNTYPE_WFS)
         return None
 
     def __addLayer(self, path, mslayer, provider, raster=False):

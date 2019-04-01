@@ -3,7 +3,7 @@
 <img src="https://github.com/guardeivid/qgsmapfile/raw/master/icon.png" width="64px" />
 
 
-Version 0.1.1 - March 2019
+Version 0.1.3 - March 2019
 
 This plugin helps import a Mapserver Mapfile in a Qgis Project, for now.
 
@@ -121,9 +121,13 @@ Types of expressions supported:
 - Logical MapServer expressions
 
 	- Logical expressions
+
 	- String expressions that return to logical value
+
 	- Arithmetic expressions that return to logical value
+
 	- String operations that return to string
+
 	- Functions that return to string (tostring, upper, lower, initcap)
 
 
@@ -131,7 +135,7 @@ Types of expressions supported:
 
 The types of connection supported (CONNECTIONTYPE) are:
 - local (Shapefile shp)
-- ogr (GML)
+- ogr (GeoJSON)
 - postgis
 - wfs
 - wms (tif, tiff, jpeg, jpg, png)

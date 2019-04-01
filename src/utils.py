@@ -69,6 +69,7 @@ class _ms(object):
     MS_SYMBOL_ARROW = 'arrow'
 
     EXTENSIONS = ('.shp', '.gml', '.tif', '.tiff', '.jpeg', '.jpg', '.png')
+    EXTENSIONS_OGR = ('.geojson', '.json')
 
     ALIGN = {
         "left": QgsPalLayerSettings.MultiLeft,
@@ -515,3 +516,7 @@ class Util(object):
                     map_ = m + '&'
                     break
         return "{}?{}".format(uri[0], map_)
+
+    @staticmethod
+    def getFileExtension(path):
+        return os.path.splitext(path)[1]

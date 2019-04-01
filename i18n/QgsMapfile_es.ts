@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE TS>
-<TS version="2.1" language="es_ES">
+<!DOCTYPE TS><TS version="2.0" language="es_ES" sourcelanguage="">
 <context>
     <name>MapfileImport</name>
     <message>
@@ -48,6 +47,16 @@
         <location filename="../ui/qgsmapfileimport_dialog.py" line="74"/>
         <source>Open main Mapfile</source>
         <translation>Abrir Mapfile principal</translation>
+    </message>
+    <message>
+        <location filename="../ui/qgsmapfileimport_dialog.py" line="93"/>
+        <source>Warning</source>
+        <translation>Atención</translation>
+    </message>
+    <message>
+        <location filename="../ui/qgsmapfileimport_dialog.py" line="93"/>
+        <source>There are no supported layers to load</source>
+        <translation>No hay capas soportadas para cargar</translation>
     </message>
 </context>
 <context>

@@ -2,7 +2,7 @@
 name=Qgs Mapfile
 qgisMinimumVersion=3.0
 description=This plugin helps import a Mapserver Mapfile in a Qgis Project
-version=0.1.1
+version=0.1.3
 author=David Orellano
 email=guardeivid@yahoo.com.ar
 
@@ -33,7 +33,11 @@ repository=https://github.com/guardeivid/qgsmapfile
 
 # Recommended items:
 
-changelog=0.1.1
+changelog=0.1.3
+    Allow load layer geojson
+    0.1.2
+    Show message if there are no supported layers to load
+    0.1.1
     Fix getMsTextLabel fieldname set a string even when there is no labelitem
 
 
